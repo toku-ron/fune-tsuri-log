@@ -173,6 +173,28 @@ function delRec(){recs=recs.filter(x=>x.id!==curDet.id);saveRecs();curDet=null;r
 
 function esc(s){if(!s)return"";return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
 
+function saveInputs(){
+  // render()前に入力中の値をformに保存する
+  const fields={
+    "inp-date":"date","inp-fdname":"fdName","inp-port":"port","inp-tel":"tel",
+    "inp-rod":"rod","inp-reel":"reel","inp-line":"line",
+    "inp-harisGo":"harisGo","inp-harisM":"harisM",
+    "inp-hookSize":"hookSize","inp-omori":"omori",
+    "inp-temp":"temp","inp-waterTemp":"waterTemp","inp-memo":"memo",
+    "inp-targetCustom":"targetCustom"
+  };
+  Object.entries(fields).forEach(([id,key])=>{
+    const el=ge(id);if(el)form[key]=el.value;
+  });
+  // 魚の入力値も保存
+  fishList.forEach((f,i)=>{
+    const l=ge("inp-flength"+i),w=ge("inp-fweight"+i),c=ge("inp-fcustom"+i);
+    if(l)f.length=l.value;
+    if(w)f.weight=w.value;
+    if(c)f.custom=c.value;
+  });
+}
+
 function makeChips(list,selected,key){
   return list.map(s=>`<span class="chip${s===selected?" on":""}" data-key="${key}" data-val="${esc(s)}">${s}</span>`).join("");
 }
@@ -186,6 +208,7 @@ document.addEventListener("click",function(e){
   if(!chip)return;
 
   if(chip.dataset.fishidx!==undefined){
+    saveInputs();
     const idx=parseInt(chip.dataset.fishidx);
     fishList[idx].species=chip.dataset.val;
     render();
@@ -193,6 +216,7 @@ document.addEventListener("click",function(e){
   }
 
   if(chip.dataset.key){
+    saveInputs();
     const key=chip.dataset.key;
     const val=chip.dataset.val;
     form[key]=val;
@@ -219,11 +243,11 @@ function renderAdd(){
         <div>${makeChips(TARGETS,form.target,"target")}</div>
         ${form.target==="その他"?`<input placeholder="釣りものを入力" value="${esc(form.targetCustom)}" onchange="form.targetCustom=this.value" style="margin-top:7px">`:""}
       </div>
-      <div class="field"><label class="lbl">日付</label><input type="date" id="inp-date" value="${form.date}" onchange="form.date=this.value"></div>
+      <div class="field"><label class="lbl">日付</label><input type="date" id="inp-date" value="${form.date}"></div>
       <div class="field"><label class="lbl">天気</label><div>${makeChips(WEATHER,form.weather,"weather")}</div></div>
       <div class="g2">
-        <div class="field"><label class="lbl">気温(℃)</label><input type="number" placeholder="20" value="${form.temp}" onchange="form.temp=this.value"></div>
-        <div class="field"><label class="lbl">水温(℃)</label><input type="number" placeholder="18" value="${form.waterTemp}" onchange="form.waterTemp=this.value"></div>
+        <div class="field"><label class="lbl">気温(℃)</label><input type="number" id="inp-temp" placeholder="20" value="${form.temp}"></div>
+        <div class="field"><label class="lbl">水温(℃)</label><input type="number" id="inp-waterTemp" placeholder="18" value="${form.waterTemp}"></div>
       </div>
       <div class="field"><label class="lbl">潮回り</label><div>${makeChips(TIDE,form.tide,"tide")}</div></div>
     </div>
@@ -240,10 +264,10 @@ function renderAdd(){
         <button class="btn-ghost" onclick="doSearch()" style="white-space:nowrap">検索</button>
       </div>
       <div id="sr"></div>
-      <div class="field"><label class="lbl">船宿名</label><input id="inp-fdname" placeholder="〇〇丸" value="${esc(form.fdName)}" onchange="form.fdName=this.value"></div>
+      <div class="field"><label class="lbl">船宿名</label><input id="inp-fdname" placeholder="〇〇丸" value="${esc(form.fdName)}"></div>
       <div class="g2">
-        <div class="field"><label class="lbl">港</label><input id="inp-port" placeholder="〇〇港" value="${esc(form.port)}" onchange="form.port=this.value"></div>
-        <div class="field"><label class="lbl">連絡先</label><input id="inp-tel" placeholder="電話番号" value="${esc(form.tel)}" onchange="form.tel=this.value"></div>
+        <div class="field"><label class="lbl">港</label><input id="inp-port" placeholder="〇〇港" value="${esc(form.port)}"></div>
+        <div class="field"><label class="lbl">連絡先</label><input id="inp-tel" placeholder="電話番号" value="${esc(form.tel)}"></div>
       </div>
       <button class="btn-ghost" style="font-size:11px;padding:5px 11px" onclick="quickSaveFD()">＋ 船宿リストに保存</button>
     </div>
@@ -253,21 +277,21 @@ function renderAdd(){
     </div>
     <div class="card">
       <div class="sec">🎣 タックル</div>
-      <div class="field"><label class="lbl">竿</label><input placeholder="例：シマノ 深海 200-300" value="${esc(form.rod)}" onchange="form.rod=this.value"></div>
-      <div class="field"><label class="lbl">リール</label><input placeholder="例：フォースマスター 600" value="${esc(form.reel)}" onchange="form.reel=this.value"></div>
-      <div class="field"><label class="lbl">道糸（号）</label><input type="number" step="0.1" placeholder="3" value="${form.line}" onchange="form.line=this.value"></div>
+      <div class="field"><label class="lbl">竿</label><input id="inp-rod" placeholder="例：シマノ 深海 200-300" value="${esc(form.rod)}"></div>
+      <div class="field"><label class="lbl">リール</label><input id="inp-reel" placeholder="例：フォースマスター 600" value="${esc(form.reel)}"></div>
+      <div class="field"><label class="lbl">道糸（号）</label><input type="number" id="inp-line" step="0.1" placeholder="3" value="${form.line}"></div>
     </div>
     <div class="card">
       <div class="sec">🪝 仕掛け</div>
       <div class="field"><label class="lbl">仕掛けの種類</label><div>${makeChips(SHIKAKE,form.shikake,"shikake")}</div></div>
       <div class="g2">
-        <div class="field"><label class="lbl">ハリス号数</label><input type="number" step="0.1" placeholder="2" value="${form.harisGo}" onchange="form.harisGo=this.value"></div>
-        <div class="field"><label class="lbl">ハリス長さ(m)</label><input type="number" step="0.5" placeholder="1.5" value="${form.harisM}" onchange="form.harisM=this.value"></div>
+        <div class="field"><label class="lbl">ハリス号数</label><input type="number" id="inp-harisGo" step="0.1" placeholder="2" value="${form.harisGo}"></div>
+        <div class="field"><label class="lbl">ハリス長さ(m)</label><input type="number" id="inp-harisM" step="0.5" placeholder="1.5" value="${form.harisM}"></div>
       </div>
       <div class="field"><label class="lbl">針の種類</label><div>${makeChips(HOOKS,form.hookType,"hookType")}</div></div>
       <div class="g2">
-        <div class="field"><label class="lbl">針サイズ（号）</label><input type="number" placeholder="10" value="${form.hookSize}" onchange="form.hookSize=this.value"></div>
-        <div class="field"><label class="lbl">オモリ（号）</label><input type="number" placeholder="60" value="${form.omori}" onchange="form.omori=this.value"></div>
+        <div class="field"><label class="lbl">針サイズ（号）</label><input type="number" id="inp-hookSize" placeholder="10" value="${form.hookSize}"></div>
+        <div class="field"><label class="lbl">オモリ（号）</label><input type="number" id="inp-omori" placeholder="60" value="${form.omori}"></div>
       </div>
     </div>
     <div class="card">
@@ -280,17 +304,17 @@ function renderAdd(){
           </div>
           <div class="field"><label class="lbl">魚種</label>
             <div>${makeFishChips(FISH,f.species,i)}</div>
-            ${f.species==="その他"?`<input placeholder="魚の名前" value="${esc(f.custom)}" onchange="fishList[${i}].custom=this.value" style="margin-top:7px">`:""}
+            ${f.species==="その他"?`<input id="inp-fcustom${i}" placeholder="魚の名前" value="${esc(f.custom)}" style="margin-top:7px">`:""}
           </div>
           <div class="g2">
-            <div class="field"><label class="lbl">長さ(cm)</label><input type="number" placeholder="35" value="${f.length}" onchange="fishList[${i}].length=this.value"></div>
-            <div class="field"><label class="lbl">重さ(g)</label><input type="number" placeholder="800" value="${f.weight}" onchange="fishList[${i}].weight=this.value"></div>
+            <div class="field"><label class="lbl">長さ(cm)</label><input type="number" id="inp-flength${i}" placeholder="35" value="${f.length}"></div>
+            <div class="field"><label class="lbl">重さ(g)</label><input type="number" id="inp-fweight${i}" placeholder="800" value="${f.weight}"></div>
           </div>
           <div class="field"><label class="lbl">釣れた数</label>
             <div class="stepper">
-              <button onclick="if(fishList[${i}].count>1){fishList[${i}].count--;ge('cnt${i}').textContent=fishList[${i}].count;}">−</button>
+              <button onclick="saveInputs();if(fishList[${i}].count>1){fishList[${i}].count--;ge('cnt${i}').textContent=fishList[${i}].count;}">−</button>
               <span id="cnt${i}">${f.count}</span>
-              <button onclick="fishList[${i}].count++;ge('cnt${i}').textContent=fishList[${i}].count;">＋</button>
+              <button onclick="saveInputs();fishList[${i}].count++;ge('cnt${i}').textContent=fishList[${i}].count;">＋</button>
             </div>
           </div>
         </div>`).join("")}
@@ -298,7 +322,7 @@ function renderAdd(){
     </div>
     <div class="card">
       <div class="sec">📝 メモ</div>
-      <textarea placeholder="ポイント、タナ、コマセ量など…" onchange="form.memo=this.value">${esc(form.memo)}</textarea>
+      <textarea id="inp-memo" placeholder="ポイント、タナ、コマセ量など…">${esc(form.memo)}</textarea>
     </div>
     <button class="btn-gold btn-full" id="savebtn" onclick="handleSave()">航海記録を保存する</button>`;
 }
@@ -310,9 +334,10 @@ window.pickFD=function(id){
   render();
 };
 window.quickSaveFD=function(){
-  const name=ge("inp-fdname")?ge("inp-fdname").value.trim():form.fdName;
-  const port=ge("inp-port")?ge("inp-port").value:form.port;
-  const tel=ge("inp-tel")?ge("inp-tel").value:form.tel;
+  saveInputs();
+  const name=form.fdName.trim();
+  const port=form.port;
+  const tel=form.tel;
   if(!name){alert("船宿名を入力してください");return;}
   form.fdName=name;form.port=port;form.tel=tel;
   if(!fds.find(f=>f.name===name)){
@@ -332,6 +357,7 @@ window.doSearch=function(){
 };
 
 window.handleSave=async function(){
+  saveInputs();
   const btn=ge("savebtn");if(btn)btn.textContent="保存中…";
   const rec={...form,id:Date.now(),fish:JSON.parse(JSON.stringify(fishList))};
   recs=[rec,...recs];saveRecs();
