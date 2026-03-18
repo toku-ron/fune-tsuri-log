@@ -436,16 +436,25 @@ function normalizeTime(v){
   if(s.includes(" ")||s.includes("GMT")){
     try{const d=new Date(s);if(!isNaN(d))return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");}catch{}
   }
-  // HH:MM:SS → HH:MM
-  if(s.match(/^\d{1,2}:\d{2}/))return s.substring(0,5);
-  return s;
+  // H:MM:SS または HH:MM:SS → HH:MM（例: 5:00:00 → 05:00）
+  const m=s.match(/^(\d{1,2}):(\d{2})(:\d{2})?$/);
+  if(m)return String(m[1]).padStart(2,"0")+":"+m[2];
+  return s.substring(0,5);
 }
 
 // 15分刻みの時間セレクト生成
 function timeSelect(id, val){
   val=String(val||"").trim();
-  // "HH:MM" or "HH:MM:SS" → "HH:MM"
-  if(val.length>5)val=val.substring(0,5);
+  // H:MM:SS または HH:MM:SS → HH:MM
+  const m=val.match(/^(\d{1,2}):(\d{2})(:\d{2})?$/);
+  if(m)val=String(m[1]).padStart(2,"0")+":"+m[2];
+  else if(val.length>5)val=val.substring(0,5);
+  // 15分刻みに丸める（例：17:23 → 17:15）
+  const parts=val.match(/^(\d{2}):(\d{2})$/);
+  if(parts){
+    const roundedMin=Math.floor(parseInt(parts[2])/15)*15;
+    val=parts[1]+":"+String(roundedMin).padStart(2,"0");
+  }
   const opts=['<option value="">--:--</option>'];
   for(let h=0;h<24;h++){
     for(let m=0;m<60;m+=15){
