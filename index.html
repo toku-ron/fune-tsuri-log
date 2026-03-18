@@ -110,29 +110,27 @@ const GAS_CODE=`function doPost(e) {
     return s.replace(/\//g,"-").substring(0,10);
   }
 
-  // 日付+船宿名+釣りもので行を特定
   function findRow(rows, headers) {
+    var idCol   = headers.indexOf("id");
     var dateCol = headers.indexOf("日付");
     var fdCol   = headers.indexOf("船宿");
-    var tgtCol  = headers.indexOf("釣りもの");
-    var targetDate  = normDate(data._oldDate);
-    var targetFd    = String(data._oldFdName  || "");
-    var targetTgt   = String(data._oldTarget  || "");
+    var oldId   = String(data._oldId   || "");
+    var oldDate = normDate(data._oldDate || "");
+    var oldFd   = String(data._oldFdName || "");
 
-    for (var i = rows.length - 1; i >= 1; i--) {
-      var rowDate = dateCol >= 0 ? normDate(rows[i][dateCol]) : "";
-      var rowFd   = fdCol   >= 0 ? String(rows[i][fdCol]  || "") : "";
-      var rowTgt  = tgtCol  >= 0 ? String(rows[i][tgtCol] || "") : "";
-      if (rowDate === targetDate && rowFd === targetFd && rowTgt === targetTgt) {
-        return i;
+    // ① fish- プレフィックス付きIDで完全一致
+    if (idCol >= 0 && oldId.indexOf("fish-") === 0) {
+      for (var i = rows.length - 1; i >= 1; i--) {
+        if (String(rows[i][idCol]) === oldId) return i;
       }
     }
-    // 釣りものが空でも日付+船宿名だけで再検索
-    for (var i = rows.length - 1; i >= 1; i--) {
-      var rowDate = dateCol >= 0 ? normDate(rows[i][dateCol]) : "";
-      var rowFd   = fdCol   >= 0 ? String(rows[i][fdCol]  || "") : "";
-      if (rowDate === targetDate && rowFd === targetFd) {
-        return i;
+
+    // ② 日付+船宿名でフォールバック（既存データ用）
+    if (dateCol >= 0 && fdCol >= 0 && oldDate) {
+      for (var i = rows.length - 1; i >= 1; i--) {
+        var rowDate = normDate(rows[i][dateCol]);
+        var rowFd   = String(rows[i][fdCol] || "");
+        if (rowDate === oldDate && rowFd === oldFd) return i;
       }
     }
     return -1;
@@ -238,7 +236,7 @@ async function loadFromSheet(){
     const data=await res.json();
     // スプレッドシートの行をrecオブジェクトに変換
     recs=data.map(row=>({
-      id:row["id"]||row["ID"]||String(Math.random()),
+      id:String(row["id"]||row["ID"]||"fish-"+Date.now()+Math.random()),
       date:row["日付"]||"",
       target:row["釣りもの"]||"",
       companion:row["同行者"]||"",
@@ -390,8 +388,7 @@ async function delRec(i){
     _action:"delete",
     _oldId:String(r.id||""),
     _oldDate:String(r.date||""),
-    _oldFdName:String(r.fdName||""),
-    _oldTarget:String(r.target||"")
+    _oldFdName:String(r.fdName||"")
   });
   recs.splice(i,1);
   updateSubtitle();
@@ -713,7 +710,7 @@ async function handleSave(){
   }
 
   const rec={
-    id:editIdx>=0?recs[editIdx].id:Date.now(),
+    id:editIdx>=0?recs[editIdx].id:"fish-"+Date.now(),
     date:ge("inp-date").value,
     target:ge("inp-target").value,
     companion:ge("inp-companion").value,
@@ -757,10 +754,9 @@ async function handleSave(){
     // 削除→再追加方式（id列がなくても確実に動く）
     const oldRec=recs[editIdx];
     payload._action="replace";
+    payload._oldId=String(oldRec.id||"");
     payload._oldDate=String(oldRec.date||"");
     payload._oldFdName=String(oldRec.fdName||"");
-    payload._oldTarget=String(oldRec.target||"");
-    payload._oldId=String(oldRec.id||"");
     await gasPost(payload);
     recs[editIdx]=rec;
     if(btn)btn.textContent="✅ 更新しました！";
