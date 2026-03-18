@@ -215,17 +215,152 @@ function showDet(i){
     ${(r.rod||r.reel||r.line)?`<div class="card"><div class="sec">🎣 タックル</div>${dr("竿",r.rod)}${dr("リール",r.reel)}${dr("道糸",r.line?r.line+"号":"")}</div>`:""}
     ${(r.shikake||r.harisGo||r.hookType||r.omori)?`<div class="card"><div class="sec">🪝 仕掛け</div>${dr("種類",r.shikake)}${dr("ハリス",r.harisGo?r.harisGo+"号"+(r.harisM?" "+r.harisM+"m":""):"")}${dr("針",r.hookType?r.hookType+(r.hookSize?" "+r.hookSize+"号":""):"")}${dr("オモリ",r.omori?r.omori+"号":"")}</div>`:""}
     ${r.memo?`<div class="card"><div class="sec">📝 メモ</div><div style="font-size:13px;color:#b0ccd8;line-height:1.8">${esc(r.memo)}</div></div>`:""}
-    <button class="btn-danger btn-full" onclick="delRec(${i})">この記録を削除する</button>`;
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px">
+      <button class="btn-ghost btn-full" onclick="showEdit(${i})">✏️ この記録を編集</button>
+      <button class="btn-danger btn-full" onclick="delRec(${i})">🗑️ 削除する</button>
+    </div>`;
   showPage("det");
 }
 
-function delRec(i){recs.splice(i,1);saveRecs();showRec();}
+function delRec(i){if(!confirm("削除しますか？"))return;recs.splice(i,1);saveRecs();showRec();}
+
+// ===== 編集モード =====
+let editIdx=-1; // -1=新規, 0以上=編集対象インデックス
+
+function showEdit(i){
+  const r=recs[i];
+  editIdx=i;
+
+  sel={
+    weather:r.weather||"",
+    windDir:r.windDir||"",
+    tide:r.tide||"",
+    seat:r.seat||"",
+    shikake:r.shikake||"",
+    hookType:r.hookType||""
+  };
+  fishSel=(r.fish||[]).map(f=>f.species||"");
+  fishCounts=(r.fish||[]).map(f=>f.count||1);
+  fishCount=Math.max(1,(r.fish||[]).length);
+
+  ge("hbtn").innerHTML=`<button class="btn-ghost" onclick="showDet(${i})">← 戻る</button>`;
+  const m=ge("page-add");
+
+  m.innerHTML=`
+    <h2 style="font-size:16px;color:#e8d48a;letter-spacing:2px;margin-bottom:18px">✏️ 釣行記録を編集</h2>
+
+    <div class="card">
+      <div class="sec">📅 基本情報</div>
+      <div class="field"><label class="lbl">日付</label><input type="date" id="inp-date" value="${esc(r.date)}"></div>
+      <div class="field"><label class="lbl">釣りもの</label><input type="text" id="inp-target" placeholder="例：マダイ、LTアジ…" value="${esc(r.target||"")}"></div>
+      <div class="field"><label class="lbl">同行者</label><input type="text" id="inp-companion" placeholder="例：田中さん…" value="${esc(r.companion||"")}"></div>
+    </div>
+
+    <div class="card">
+      <div class="sec">🏠 船宿</div>
+      <div id="fav-fds"></div>
+      <div style="display:flex;gap:7px;margin-bottom:8px">
+        <input type="text" id="sq" placeholder="船宿を検索…" style="flex:1">
+        <button class="btn-ghost" data-search style="white-space:nowrap">検索</button>
+      </div>
+      <div id="sr" style="margin-bottom:8px"></div>
+      <div class="field"><label class="lbl">船宿名</label><input type="text" id="inp-fdName" placeholder="〇〇丸" value="${esc(r.fdName||"")}"></div>
+      <div class="g2">
+        <div class="field"><label class="lbl">港</label><input type="text" id="inp-port" placeholder="〇〇港" value="${esc(r.port||"")}"></div>
+        <div class="field"><label class="lbl">連絡先</label><input type="tel" id="inp-tel" placeholder="電話番号" value="${esc(r.tel||"")}"></div>
+      </div>
+      <div class="field"><label class="lbl">出船時間</label><input type="time" id="inp-departure" value="${esc(r.departure||"")}"></div>
+    </div>
+
+    <div class="card">
+      <div class="sec">🌤️ 天候</div>
+      <div style="margin-bottom:12px">
+        <button class="btn-ghost btn-full" id="weather-btn" onclick="fetchWeather()">📍 現在地の天候を自動取得</button>
+        <div id="weather-status" style="font-size:11px;color:#6a9ab8;margin-top:6px;text-align:center"></div>
+      </div>
+      <div class="field"><label class="lbl">天気</label><div class="chips" id="chips-weather"></div></div>
+      <div class="g2">
+        <div class="field"><label class="lbl">風向</label><div class="chips" id="chips-windDir" style="gap:4px"></div></div>
+        <div class="field"><label class="lbl">風速 (m/s)</label><input type="number" id="inp-windSpeed" placeholder="5" step="0.5" value="${esc(r.windSpeed||"")}"></div>
+      </div>
+      <div class="g2">
+        <div class="field"><label class="lbl">気温(℃)</label><input type="number" id="inp-temp" placeholder="20" value="${esc(r.temp||"")}"></div>
+        <div class="field"><label class="lbl">水温(℃)</label><input type="number" id="inp-waterTemp" placeholder="18" value="${esc(r.waterTemp||"")}"></div>
+      </div>
+      <div class="field"><label class="lbl">潮回り</label><div class="chips" id="chips-tide"></div></div>
+    </div>
+
+    <div class="card">
+      <div class="sec">🚢 乗船位置</div>
+      <div class="field"><label class="lbl">座席</label><div class="chips" id="chips-seat"></div></div>
+    </div>
+
+    <div class="card">
+      <div class="sec">🎣 タックル</div>
+      <div class="field"><label class="lbl">竿</label><input type="text" id="inp-rod" value="${esc(r.rod||"")}" placeholder="例：シマノ 深海 200-300"></div>
+      <div class="field"><label class="lbl">リール</label><input type="text" id="inp-reel" value="${esc(r.reel||"")}" placeholder="例：フォースマスター 600"></div>
+      <div class="field"><label class="lbl">道糸（号）</label><input type="number" id="inp-line" step="0.1" value="${esc(r.line||"")}"></div>
+    </div>
+
+    <div class="card">
+      <div class="sec">🪝 仕掛け</div>
+      <div class="field"><label class="lbl">仕掛けの種類</label><div class="chips" id="chips-shikake"></div></div>
+      <div class="g2">
+        <div class="field"><label class="lbl">ハリス号数</label><input type="number" id="inp-harisGo" step="0.1" value="${esc(r.harisGo||"")}"></div>
+        <div class="field"><label class="lbl">ハリス長さ(m)</label><input type="number" id="inp-harisM" step="0.5" value="${esc(r.harisM||"")}"></div>
+      </div>
+      <div class="field"><label class="lbl">針の種類</label><div class="chips" id="chips-hookType"></div></div>
+      <div class="g2">
+        <div class="field"><label class="lbl">針サイズ（号）</label><input type="number" id="inp-hookSize" value="${esc(r.hookSize||"")}"></div>
+        <div class="field"><label class="lbl">オモリ（号）</label><input type="number" id="inp-omori" value="${esc(r.omori||"")}"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="sec">🐟 釣果（複数可）</div>
+      <div id="fish-list"></div>
+      <button class="btn-ghost btn-full" onclick="addFishRow()">＋ 魚を追加</button>
+    </div>
+
+    <div class="card">
+      <div class="sec">📝 メモ</div>
+      <textarea id="inp-memo" placeholder="ポイント、タナ、コマセ量など…">${esc(r.memo||"")}</textarea>
+    </div>
+
+    <button class="btn-gold btn-full" id="savebtn" onclick="handleSave()">変更を保存する</button>`;
+
+  initChips("chips-weather",WEATHER,"weather",sel,null);
+  initChips("chips-windDir",WIND_DIR,"windDir",sel,null);
+  initChips("chips-tide",TIDE,"tide",sel,null);
+  initChips("chips-seat",SEATS,"seat",sel,null);
+  initChips("chips-shikake",SHIKAKE,"shikake",sel,null);
+  initChips("chips-hookType",HOOKS,"hookType",sel,null);
+
+  const sqBtn=ge("page-add").querySelector("[data-search]");
+  if(sqBtn)sqBtn.addEventListener("click",doSearch);
+  const sqInp=ge("sq");
+  if(sqInp)sqInp.addEventListener("keydown",function(e){if(e.key==="Enter")doSearch();});
+
+  renderFavFds();
+  renderFishList();
+
+  // 既存の魚データを入力欄に反映
+  (r.fish||[]).forEach((f,i)=>{
+    setTimeout(()=>{
+      if(ge("fish-length-"+i))ge("fish-length-"+i).value=f.length||"";
+      if(ge("fish-weight-"+i))ge("fish-weight-"+i).value=f.weight||"";
+    },50);
+  });
+
+  showPage("add");
+}
 
 // ===== 記録フォーム =====
 let sel={},fishSel=[],fishCounts=[];
 let fishCount=1;
 
 function showAdd(){
+  editIdx=-1;
   sel={weather:"",windDir:"",tide:"",seat:"",shikake:"",hookType:""};
   fishSel=[""];
   fishCounts=[1];
@@ -250,7 +385,7 @@ function showAdd(){
       <div id="fav-fds"></div>
       <div style="display:flex;gap:7px;margin-bottom:8px">
         <input type="text" id="sq" placeholder="船宿を検索…" style="flex:1">
-        <button class="btn-ghost" onclick="doSearch()" style="white-space:nowrap">検索</button>
+        <button class="btn-ghost" data-search style="white-space:nowrap">検索</button>
       </div>
       <div id="sr" style="margin-bottom:8px"></div>
       <div class="field"><label class="lbl">船宿名</label><input type="text" id="inp-fdName" placeholder="〇〇丸"></div>
@@ -326,6 +461,12 @@ function showAdd(){
   initChips("chips-seat",SEATS,"seat",sel,null);
   initChips("chips-shikake",SHIKAKE,"shikake",sel,null);
   initChips("chips-hookType",HOOKS,"hookType",sel,null);
+
+  // 検索ボタンをイベントリスナーで登録
+  const sqBtn=ge("page-add").querySelector("[data-search]");
+  if(sqBtn)sqBtn.addEventListener("click",doSearch);
+  const sqInp=ge("sq");
+  if(sqInp)sqInp.addEventListener("keydown",function(e){if(e.key==="Enter")doSearch();});
 
   renderFavFds();
   renderFishList();
@@ -561,12 +702,20 @@ async function handleSave(){
     fish:fish
   };
 
-  recs=[rec,...recs];
-  saveRecs();
-  await sendSheet(rec);
-
-  if(btn)btn.textContent="✅ 保存しました！";
-  setTimeout(()=>showRec(),900);
+  if(editIdx>=0){
+    // 編集モード：既存レコードを上書き
+    recs[editIdx]={...recs[editIdx],...rec,id:recs[editIdx].id};
+    saveRecs();
+    if(btn)btn.textContent="✅ 更新しました！";
+    setTimeout(()=>showDet(editIdx),900);
+  } else {
+    // 新規モード
+    recs=[rec,...recs];
+    saveRecs();
+    await sendSheet(rec);
+    if(btn)btn.textContent="✅ 保存しました！";
+    setTimeout(()=>showRec(),900);
+  }
 }
 
 async function sendSheet(rec){
