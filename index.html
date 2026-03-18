@@ -9,47 +9,50 @@
 body{background:linear-gradient(160deg,#04111d,#081a2e 50%,#051420);min-height:100vh;font-family:Georgia,serif;color:#d4e8f4;font-size:14px;}
 .header{background:rgba(4,17,29,0.95);border-bottom:1px solid rgba(180,150,60,0.25);padding:13px 16px;position:sticky;top:0;z-index:20;}
 .header-top{display:flex;justify-content:space-between;align-items:center;}
-.title{font-size:18px;font-weight:700;color:#e8d48a;letter-spacing:2px;}
-.subtitle{font-size:10px;color:#6a9ab8;letter-spacing:2px;margin-top:2px;}
-.version{font-size:9px;color:#3a6a88;letter-spacing:1px;margin-top:1px;}
+.title{font-size:1.3em;font-weight:700;color:#e8d48a;letter-spacing:2px;}
+.subtitle{font-size:0.72em;color:#6a9ab8;letter-spacing:2px;margin-top:2px;}
+.version{font-size:0.65em;color:#3a6a88;letter-spacing:1px;margin-top:1px;}
 .tabs{display:flex;margin-top:10px;}
-.tab{padding:8px 14px;font-size:11px;cursor:pointer;border:none;border-radius:5px 5px 0 0;background:transparent;color:#5a8aaa;border-bottom:2px solid transparent;font-family:Georgia,serif;-webkit-tap-highlight-color:transparent;}
+.tab{padding:8px 14px;font-size:0.78em;cursor:pointer;border:none;border-radius:5px 5px 0 0;background:transparent;color:#5a8aaa;border-bottom:2px solid transparent;font-family:Georgia,serif;-webkit-tap-highlight-color:transparent;}
 .tab.active{background:rgba(180,150,60,0.18);color:#e8d48a;border-bottom:2px solid #c8a830;}
 .wrap{max-width:500px;margin:0 auto;padding:18px 14px 80px;}
 .card{background:rgba(255,255,255,0.03);border:1px solid rgba(180,150,60,0.15);border-radius:12px;padding:16px;margin-bottom:12px;}
-.sec{font-size:10px;letter-spacing:3px;color:#c8a830;text-transform:uppercase;margin-bottom:12px;}
-.lbl{display:block;font-size:10px;letter-spacing:2px;color:#7aacb8;margin-bottom:5px;}
+.sec{font-size:0.72em;letter-spacing:3px;color:#c8a830;text-transform:uppercase;margin-bottom:12px;}
+.lbl{display:block;font-size:0.72em;letter-spacing:2px;color:#7aacb8;margin-bottom:5px;}
 .field{margin-bottom:13px;}
-input[type=text],input[type=number],input[type=date],input[type=tel],input[type=time],textarea{width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(120,160,190,0.22);border-radius:8px;color:#d4e8f4;padding:10px 12px;font-size:14px;outline:none;box-sizing:border-box;font-family:Georgia,serif;-webkit-appearance:none;}
+input[type=text],input[type=number],input[type=date],input[type=tel],input[type=time],textarea,select{width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(120,160,190,0.22);border-radius:8px;color:#d4e8f4;padding:10px 12px;font-size:1em;outline:none;box-sizing:border-box;font-family:Georgia,serif;-webkit-appearance:none;}
 textarea{resize:vertical;height:80px;}
+select option{background:#0b1f35;color:#d4e8f4;}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px;}
-.chip{padding:8px 14px;border-radius:20px;font-size:12px;cursor:pointer;background:rgba(255,255,255,0.04);border:1px solid rgba(120,160,190,0.18);color:#7aacb8;-webkit-tap-highlight-color:transparent;touch-action:manipulation;user-select:none;}
+.chip{padding:8px 14px;border-radius:20px;font-size:0.86em;cursor:pointer;background:rgba(255,255,255,0.04);border:1px solid rgba(120,160,190,0.18);color:#7aacb8;-webkit-tap-highlight-color:transparent;touch-action:manipulation;user-select:none;}
 .chip.on{background:rgba(180,150,60,0.3);border:1px solid #c8a830;color:#e8d48a;}
-.btn-gold{background:linear-gradient(135deg,#b8940a,#7a5e00);color:#fff8e0;border:none;border-radius:9px;padding:11px 22px;font-size:14px;cursor:pointer;font-weight:700;font-family:Georgia,serif;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
-.btn-ghost{background:none;border:1px solid rgba(120,160,190,0.3);color:#7aacb8;border-radius:8px;padding:9px 16px;cursor:pointer;font-size:13px;font-family:Georgia,serif;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
-.btn-danger{background:rgba(150,30,30,0.18);border:1px solid rgba(160,40,40,0.32);color:#e09090;border-radius:8px;padding:9px 16px;cursor:pointer;font-size:13px;font-family:Georgia,serif;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+.btn-gold{background:linear-gradient(135deg,#b8940a,#7a5e00);color:#fff8e0;border:none;border-radius:9px;padding:11px 22px;font-size:1em;cursor:pointer;font-weight:700;font-family:Georgia,serif;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+.btn-ghost{background:none;border:1px solid rgba(120,160,190,0.3);color:#7aacb8;border-radius:8px;padding:9px 16px;cursor:pointer;font-size:0.93em;font-family:Georgia,serif;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+.btn-danger{background:rgba(150,30,30,0.18);border:1px solid rgba(160,40,40,0.32);color:#e09090;border-radius:8px;padding:9px 16px;cursor:pointer;font-size:0.93em;font-family:Georgia,serif;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
 .btn-full{width:100%;margin-top:4px;}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .rec-card{background:rgba(255,255,255,0.03);border:1px solid rgba(180,150,60,0.15);border-radius:11px;padding:14px 16px;margin-bottom:11px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
 .fd-card{background:rgba(255,255,255,0.03);border:1px solid rgba(180,150,60,0.15);border-radius:11px;padding:13px 15px;margin-bottom:9px;}
 .fish-card{background:rgba(0,0,0,0.2);border:1px solid rgba(120,160,190,0.15);border-radius:9px;padding:14px;margin-bottom:9px;}
-.dr{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(120,160,190,0.08);font-size:13px;}
-.dl{color:#6a9ab8;}.dv{color:#d4e8f4;}
+.dr{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(120,160,190,0.08);}
+.dl{color:#6a9ab8;font-size:0.93em;}.dv{color:#d4e8f4;font-size:0.93em;}
 .empty{text-align:center;padding:60px 0;color:#3a6a88;}
 .stepper{display:inline-flex;align-items:center;background:rgba(255,255,255,0.05);border:1px solid rgba(120,160,190,0.2);border-radius:8px;overflow:hidden;}
-.stepper button{background:none;border:none;color:#7aacb8;font-size:20px;padding:6px 16px;cursor:pointer;font-family:Georgia,serif;line-height:1;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
-.stepper span{color:#d4e8f4;font-size:16px;font-weight:700;min-width:36px;text-align:center;}
+.stepper button{background:none;border:none;color:#7aacb8;font-size:1.3em;padding:6px 16px;cursor:pointer;font-family:Georgia,serif;line-height:1;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+.stepper span{color:#d4e8f4;font-size:1.1em;font-weight:700;min-width:36px;text-align:center;}
 .loading{text-align:center;padding:60px 0;color:#5a8aaa;}
-.loading-spin{font-size:36px;display:block;margin-bottom:12px;animation:spin 1.5s linear infinite;}
+.loading-spin{font-size:2.5em;display:block;margin-bottom:12px;animation:spin 1.5s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
 .no-gas{text-align:center;padding:50px 20px;color:#5a8aaa;}
-.steps{background:rgba(0,0,0,0.3);border-radius:9px;padding:14px;margin-bottom:14px;font-size:13px;line-height:2.2;color:#aac8d8;}
-.code-box{background:#020a12;border:1px solid rgba(120,160,190,0.18);border-radius:7px;padding:12px;font-size:11px;color:#7aecb8;font-family:monospace;line-height:1.7;white-space:pre-wrap;margin-bottom:8px;word-break:break-all;}
+.steps{background:rgba(0,0,0,0.3);border-radius:9px;padding:14px;margin-bottom:14px;font-size:0.93em;line-height:2.2;color:#aac8d8;}
+.code-box{background:#020a12;border:1px solid rgba(120,160,190,0.18);border-radius:7px;padding:12px;font-size:0.78em;color:#7aecb8;font-family:monospace;line-height:1.7;white-space:pre-wrap;margin-bottom:8px;word-break:break-all;}
 .hidden{display:none;}
 .add-fish-inp{display:flex;gap:7px;margin-top:8px;}
 .add-fish-inp input{flex:1;}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(180,150,60,0.95);color:#fff8e0;padding:10px 24px;border-radius:20px;font-size:13px;z-index:100;pointer-events:none;opacity:0;transition:opacity 0.3s;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(180,150,60,0.95);color:#fff8e0;padding:10px 24px;border-radius:20px;font-size:0.93em;z-index:100;pointer-events:none;opacity:0;transition:opacity 0.3s;}
 .toast.show{opacity:1;}
+.time-select{display:flex;gap:6px;align-items:center;}
+.time-select select{flex:1;}
 </style>
 </head>
 <body>
@@ -226,8 +229,8 @@ async function loadFromSheet(){
       fdName:row["船宿"]||"",
       port:row["港"]||"",
       tel:row["連絡先"]||"",
-      departure:row["出船時間"]||"",
-      returnTime:row["沖揚がり時間"]||"",
+      departure:normalizeTime(row["出船時間"]||""),
+      returnTime:normalizeTime(row["沖揚がり時間"]||""),
       seat:row["座席"]||"",
       weather:row["天気"]||"",
       windDir:row["風向"]||"",
@@ -406,7 +409,35 @@ function initFishChips(containerId,list,idx){
   });
 }
 
-// ===== フォーム =====
+// 時刻を HH:MM 形式に正規化
+function normalizeTime(v){
+  if(!v)return"";
+  const s=String(v).trim();
+  // Date型で来た場合（例: "Sat Dec 30 1899 05:00:00 GMT+0900"）
+  if(s.includes(" ")||s.includes("GMT")){
+    try{const d=new Date(s);if(!isNaN(d))return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");}catch{}
+  }
+  // HH:MM:SS → HH:MM
+  if(s.match(/^\d{1,2}:\d{2}/))return s.substring(0,5);
+  return s;
+}
+
+// 15分刻みの時間セレクト生成
+function timeSelect(id, val){
+  val=String(val||"").trim();
+  // "HH:MM" or "HH:MM:SS" → "HH:MM"
+  if(val.length>5)val=val.substring(0,5);
+  const opts=['<option value="">--:--</option>'];
+  for(let h=0;h<24;h++){
+    for(let m=0;m<60;m+=15){
+      const hh=String(h).padStart(2,"0");
+      const mm=String(m).padStart(2,"0");
+      const t=hh+":"+mm;
+      opts.push(`<option value="${t}"${val===t?" selected":""}>${t}</option>`);
+    }
+  }
+  return `<select id="${id}">${opts.join("")}</select>`;
+}
 function buildForm(r){
   const today=new Date().toISOString().split("T")[0];
   // 日付をyyyy-mm-dd形式に正規化
@@ -440,8 +471,8 @@ function buildForm(r){
         <div class="field"><label class="lbl">連絡先</label><input type="tel" id="inp-tel" placeholder="電話番号" value="${v("tel")}"></div>
       </div>
       <div class="g2">
-        <div class="field"><label class="lbl">出船時間</label><input type="time" id="inp-departure" value="${v("departure")}"></div>
-        <div class="field"><label class="lbl">沖揚がり時間</label><input type="time" id="inp-returnTime" value="${v("returnTime")}"></div>
+        <div class="field"><label class="lbl">出船時間</label>${timeSelect("inp-departure", r?r.departure:"")}</div>
+        <div class="field"><label class="lbl">沖揚がり時間</label>${timeSelect("inp-returnTime", r?r.returnTime:"")}</div>
       </div>
       <button class="btn-ghost" id="save-fd-btn" style="font-size:12px;padding:7px 14px">＋ 船宿リストに保存</button>
     </div>
