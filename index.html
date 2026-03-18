@@ -227,6 +227,7 @@ async function loadFromSheet(){
       port:row["港"]||"",
       tel:row["連絡先"]||"",
       departure:row["出船時間"]||"",
+      returnTime:row["沖揚がり時間"]||"",
       seat:row["座席"]||"",
       weather:row["天気"]||"",
       windDir:row["風向"]||"",
@@ -321,11 +322,7 @@ function showRec(){
 
 // ===== 詳細 =====
 function showDet(i){
-  ge("hbtn").innerHTML=`
-    <div style="display:flex;gap:6px">
-      <button class="btn-ghost" style="padding:7px 12px;font-size:12px" onclick="showEdit(${i})">✏️ 編集</button>
-      <button class="btn-ghost" onclick="showRec()">← 戻る</button>
-    </div>`;
+  ge("hbtn").innerHTML=`<button class="btn-ghost" onclick="showRec()">← 戻る</button>`;
   const r=recs[i];
   const dr=(l,v)=>v?`<div class="dr"><span class="dl">${l}</span><span class="dv">${esc(String(v))}</span></div>`:"";
   ge("page-det").innerHTML=`
@@ -335,7 +332,7 @@ function showDet(i){
       ${r.target?`<div style="font-size:13px;color:#c8a830;margin-top:2px">🎯 ${esc(r.target)}</div>`:""}
       <div style="font-size:12px;color:#6a9ab8;margin-top:4px">${esc(r.port)}${r.seat?"　"+esc(r.seat):""}</div>
       ${r.tel?`<div style="font-size:12px;color:#5a8aaa;margin-top:2px">📞 ${esc(r.tel)}</div>`:""}
-      ${r.departure?`<div style="font-size:12px;color:#7aacb8;margin-top:2px">⛵ 出船 ${esc(r.departure)}</div>`:""}
+      ${r.departure?`<div style="font-size:12px;color:#7aacb8;margin-top:2px">⛵ 出船 ${esc(r.departure)}${r.returnTime?"　🚢 沖揚がり "+esc(r.returnTime):""}</div>`:""}
       ${r.companion?`<div style="font-size:12px;color:#7aacb8;margin-top:2px">👥 ${esc(r.companion)}</div>`:""}
     </div>
     <div class="card"><div class="sec">🐟 釣果</div>
@@ -357,7 +354,11 @@ function showDet(i){
     ${(r.rod||r.reel||r.line)?`<div class="card"><div class="sec">🎣 タックル</div>${dr("竿",r.rod)}${dr("リール",r.reel)}${dr("道糸",r.line?r.line+"号":"")}</div>`:""}
     ${(r.shikake||r.harisGo||r.hookType||r.omori)?`<div class="card"><div class="sec">🪝 仕掛け</div>${dr("種類",r.shikake)}${dr("ハリス",r.harisGo?r.harisGo+"号"+(r.harisM?" "+r.harisM+"m":""):"")}${dr("針",r.hookType?r.hookType+(r.hookSize?" "+r.hookSize+"号":""):"")}${dr("オモリ",r.omori?r.omori+"号":"")}</div>`:""}
     ${r.memo?`<div class="card"><div class="sec">📝 メモ</div><div style="font-size:13px;color:#b0ccd8;line-height:1.8">${esc(r.memo)}</div></div>`:""}
-    <button class="btn-danger btn-full" id="del-btn">🗑️ この記録を削除する</button>`;
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px">
+      <button class="btn-ghost btn-full" id="edit-btn">✏️ 編集する</button>
+      <button class="btn-danger btn-full" id="del-btn">🗑️ 削除する</button>
+    </div>`;
+  ge("edit-btn").addEventListener("click",function(){showEdit(i);});
   ge("del-btn").addEventListener("click",function(){delRec(i);});
   showPage("det");
 }
@@ -407,13 +408,21 @@ function initFishChips(containerId,list,idx){
 
 // ===== フォーム =====
 function buildForm(r){
-  // r=null なら新規、r=object なら編集
-  const v=k=>r?esc(r[k]||""):"";
   const today=new Date().toISOString().split("T")[0];
+  // 日付をyyyy-mm-dd形式に正規化
+  let dateVal=today;
+  if(r&&r.date){
+    const d=String(r.date).trim();
+    // Googleスプレッドシートからの日付はDate型で来ることがあるので変換
+    if(d.match(/^\d{4}-\d{2}-\d{2}$/)){dateVal=d;}
+    else if(d.match(/^\d{4}\/\d{2}\/\d{2}$/)){dateVal=d.replace(/\//g,"-");}
+    else{try{const dt=new Date(d);if(!isNaN(dt))dateVal=dt.toISOString().split("T")[0];}catch{}}
+  }
+  const v=k=>r?esc(String(r[k]||"")):"";
   return `
     <div class="card">
       <div class="sec">📅 基本情報</div>
-      <div class="field"><label class="lbl">日付</label><input type="date" id="inp-date" value="${r?v("date"):today}"></div>
+      <div class="field"><label class="lbl">日付</label><input type="date" id="inp-date" value="${dateVal}"></div>
       <div class="field"><label class="lbl">釣りもの</label><input type="text" id="inp-target" placeholder="例：マダイ、LTアジ…" value="${v("target")}"></div>
       <div class="field"><label class="lbl">同行者</label><input type="text" id="inp-companion" placeholder="例：田中さん…" value="${v("companion")}"></div>
     </div>
@@ -430,7 +439,10 @@ function buildForm(r){
         <div class="field"><label class="lbl">港</label><input type="text" id="inp-port" placeholder="〇〇港" value="${v("port")}"></div>
         <div class="field"><label class="lbl">連絡先</label><input type="tel" id="inp-tel" placeholder="電話番号" value="${v("tel")}"></div>
       </div>
-      <div class="field"><label class="lbl">出船時間</label><input type="time" id="inp-departure" value="${v("departure")}"></div>
+      <div class="g2">
+        <div class="field"><label class="lbl">出船時間</label><input type="time" id="inp-departure" value="${v("departure")}"></div>
+        <div class="field"><label class="lbl">沖揚がり時間</label><input type="time" id="inp-returnTime" value="${v("returnTime")}"></div>
+      </div>
       <button class="btn-ghost" id="save-fd-btn" style="font-size:12px;padding:7px 14px">＋ 船宿リストに保存</button>
     </div>
     <div class="card">
@@ -656,6 +668,7 @@ async function handleSave(){
     port:ge("inp-port").value,
     tel:ge("inp-tel").value,
     departure:ge("inp-departure").value,
+    returnTime:ge("inp-returnTime")?ge("inp-returnTime").value:"",
     weather:sel.weather,
     windDir:sel.windDir,
     windSpeed:ge("inp-windSpeed").value,
@@ -678,7 +691,7 @@ async function handleSave(){
 
   const payload={
     id:rec.id,日付:rec.date,釣りもの:rec.target,同行者:rec.companion,
-    船宿:rec.fdName,港:rec.port,連絡先:rec.tel,出船時間:rec.departure,
+    船宿:rec.fdName,港:rec.port,連絡先:rec.tel,出船時間:rec.departure,沖揚がり時間:rec.returnTime,
     座席:rec.seat,天気:rec.weather,風向:rec.windDir,風速:rec.windSpeed,
     潮回り:rec.tide,気温:rec.temp,水温:rec.waterTemp,
     竿:rec.rod,リール:rec.reel,道糸号数:rec.line,
