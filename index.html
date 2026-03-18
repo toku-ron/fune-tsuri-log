@@ -94,8 +94,11 @@ const GAS_CODE=`function doPost(e) {
 
   if (action === "delete") {
     const rows = sheet.getDataRange().getValues();
+    const headers = rows[0];
+    const idCol = headers.indexOf("id");
     for (let i = rows.length - 1; i >= 1; i--) {
-      if (String(rows[i][0]) === String(data._id)) {
+      const rowId = idCol >= 0 ? String(rows[i][idCol]) : String(rows[i][0]);
+      if (rowId === String(data._id)) {
         sheet.deleteRow(i + 1); break;
       }
     }
@@ -105,19 +108,40 @@ const GAS_CODE=`function doPost(e) {
   if (action === "update") {
     const rows = sheet.getDataRange().getValues();
     const headers = rows[0];
-    for (let i = 1; i < rows.length; i++) {
-      if (String(rows[i][0]) === String(data._id)) {
-        headers.forEach((h, j) => {
-          if (h && data[h] !== undefined) sheet.getRange(i+1, j+1).setValue(data[h]);
-        });
-        break;
+    const idCol = headers.indexOf("id");
+    const dateCol = headers.indexOf("日付");
+    const fdCol = headers.indexOf("船宿");
+    let targetRow = -1;
+    // まずidで検索
+    if (idCol >= 0) {
+      for (let i = 1; i < rows.length; i++) {
+        if (String(rows[i][idCol]) === String(data._id)) { targetRow = i; break; }
       }
+    }
+    // idで見つからなければ日付+船宿名で検索
+    if (targetRow < 0 && dateCol >= 0 && fdCol >= 0) {
+      for (let i = 1; i < rows.length; i++) {
+        if (String(rows[i][dateCol]) === String(data._date) &&
+            String(rows[i][fdCol]) === String(data._fdName)) {
+          targetRow = i; break;
+        }
+      }
+    }
+    if (targetRow >= 0) {
+      headers.forEach((h, j) => {
+        if (h && !h.startsWith("_") && data[h] !== undefined) {
+          sheet.getRange(targetRow + 1, j + 1).setValue(data[h]);
+        }
+      });
     }
     return ContentService.createTextOutput("ok").setMimeType(ContentService.MimeType.TEXT);
   }
 
-  if (sheet.getLastRow() === 0) sheet.appendRow(Object.keys(data));
-  sheet.appendRow(Object.values(data));
+  // 新規追加
+  const keys = Object.keys(data).filter(k => !k.startsWith("_"));
+  const vals = keys.map(k => data[k]);
+  if (sheet.getLastRow() === 0) sheet.appendRow(keys);
+  sheet.appendRow(vals);
   return ContentService.createTextOutput("ok").setMimeType(ContentService.MimeType.TEXT);
 }
 
@@ -137,15 +161,22 @@ function doGet(e) {
 let gasUrl="", recs=[], fds=[], customFishDB=[];
 let curTab="rec", editIdx=-1;
 let sel={}, fishSel=[], fishCounts=[], fishCount=1;
+let fontSize=14;
 
 // ===== 初期化 =====
 function init(){
   try{const g=localStorage.getItem(SK_G);if(g)gasUrl=g;}catch{}
   try{const f=localStorage.getItem(SK_F);if(f)fds=JSON.parse(f);}catch{}
   try{const cf=localStorage.getItem(SK_FISH);if(cf)customFishDB=JSON.parse(cf);}catch{}
+  try{const fs=localStorage.getItem("fune-fontsize");if(fs)fontSize=parseInt(fs);}catch{}
+  applyFontSize();
   showPage("rec");
   if(gasUrl) loadFromSheet();
   else showRec();
+}
+
+function applyFontSize(){
+  document.body.style.fontSize=fontSize+"px";
 }
 
 function ge(id){return document.getElementById(id);}
@@ -657,10 +688,15 @@ async function handleSave(){
   };
 
   if(editIdx>=0){
-    payload._action="update";payload._id=rec.id;
+    payload._action="update";
+    payload._id=rec.id;
+    // スプレッドシート上で日付+船宿名でも特定できるよう追加
+    payload._date=rec.date;
+    payload._fdName=rec.fdName;
     await gasPost(payload);
     recs[editIdx]=rec;
     if(btn)btn.textContent="✅ 更新しました！";
+    toast("記録を更新しました");
     setTimeout(()=>showDet(editIdx),900);
   } else {
     await gasPost(payload);
@@ -773,8 +809,21 @@ function showFdForm(id){
 function showSet(){
   ge("hbtn").innerHTML="";
   ge("page-set").innerHTML=`
-    <h2 style="font-size:16px;color:#e8d48a;letter-spacing:2px;margin-bottom:18px">⚙️ Google スプレッドシート連携</h2>
+    <h2 style="font-size:16px;color:#e8d48a;letter-spacing:2px;margin-bottom:18px">⚙️ 設定</h2>
+
     <div class="card">
+      <div class="sec">🔤 文字サイズ</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <span style="font-size:13px;color:#7aacb8">現在のサイズ：<span id="font-size-label">${fontSize}px</span></span>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        ${[12,13,14,15,16,18,20].map(s=>`<button class="chip${fontSize===s?" on":""}" data-fs="${s}" style="padding:8px 16px;font-size:${s}px">${s}px</button>`).join("")}
+      </div>
+      <div style="font-size:11px;color:#5a8aaa;margin-top:10px">タップするとすぐに反映されます</div>
+    </div>
+
+    <div class="card">
+      <div class="sec">📊 Google スプレッドシート連携</div>
       <div style="font-size:13px;color:#7aacb8;line-height:1.9;margin-bottom:14px">
         スプレッドシートがデータの保存場所です。PCでもスマホでも同じデータが見られます。
       </div>
@@ -794,6 +843,17 @@ function showSet(){
       </div>
       <div id="gas-st" style="font-size:12px;margin-top:4px;color:${gasUrl?"#4ab870":"#5a8aaa"}">${gasUrl?"✅ 連携済み":"URLを設定してください"}</div>
     </div>`;
+  // フォントサイズボタン
+  ge("page-set").querySelectorAll("[data-fs]").forEach(btn=>{
+    btn.addEventListener("click",function(){
+      fontSize=parseInt(this.dataset.fs);
+      try{localStorage.setItem("fune-fontsize",fontSize);}catch{}
+      applyFontSize();
+      ge("page-set").querySelectorAll("[data-fs]").forEach(b=>b.classList.toggle("on",parseInt(b.dataset.fs)===fontSize));
+      const lbl=ge("font-size-label");if(lbl)lbl.textContent=fontSize+"px";
+      toast("文字サイズを "+fontSize+"px に変更しました");
+    });
+  });
   ge("copybtn").addEventListener("click",()=>{
     navigator.clipboard.writeText(GAS_CODE).then(()=>{ge("copybtn").textContent="✅ コピーしました！";setTimeout(()=>ge("copybtn").textContent="📋 コードをコピー",2000);}).catch(()=>alert("手動でコピーしてください"));
   });
