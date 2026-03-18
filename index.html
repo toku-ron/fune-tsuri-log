@@ -237,6 +237,8 @@ async function loadFromSheet(){
     // スプレッドシートの行をrecオブジェクトに変換
     recs=data.map(row=>({
       id:String(row["id"]||row["ID"]||"fish-"+Date.now()+Math.random()),
+      createdAt:row["作成日時"]||"",
+      updatedAt:row["更新日時"]||"",
       date:row["日付"]||"",
       target:row["釣りもの"]||"",
       companion:row["同行者"]||"",
@@ -370,7 +372,8 @@ function showDet(i){
     </div>
     ${(r.rod||r.reel||r.line)?`<div class="card"><div class="sec">🎣 タックル</div>${dr("竿",r.rod)}${dr("リール",r.reel)}${dr("道糸",r.line?r.line+"号":"")}</div>`:""}
     ${(r.shikake||r.harisGo||r.hookType||r.omori)?`<div class="card"><div class="sec">🪝 仕掛け</div>${dr("種類",r.shikake)}${dr("ハリス",r.harisGo?r.harisGo+"号"+(r.harisM?" "+r.harisM+"m":""):"")}${dr("針",r.hookType?r.hookType+(r.hookSize?" "+r.hookSize+"号":""):"")}${dr("オモリ",r.omori?r.omori+"号":"")}</div>`:""}
-    ${r.memo?`<div class="card"><div class="sec">📝 メモ</div><div style="font-size:13px;color:#b0ccd8;line-height:1.8">${esc(r.memo)}</div></div>`:""}
+    ${r.memo?`<div class="card"><div class="sec">📝 メモ</div><div style="font-size:0.93em;color:#b0ccd8;line-height:1.8">${esc(r.memo)}</div></div>`:""}
+    ${r.updatedAt?`<div style="font-size:0.72em;color:#3a6a88;text-align:right;margin-bottom:8px">最終更新: ${esc(r.updatedAt)}</div>`:""}
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px">
       <button class="btn-ghost btn-full" id="edit-btn">✏️ 編集する</button>
       <button class="btn-danger btn-full" id="del-btn">🗑️ 削除する</button>
@@ -430,8 +433,19 @@ function initFishChips(containerId,list,idx){
 
 // 時刻を HH:MM 形式に正規化
 function normalizeTime(v){
-  if(!v)return"";
+  if(!v&&v!==0)return"";
+  // 数値（小数）の場合 → Googleスプレッドシートの時刻内部形式 0.208333... = 5:00
+  if(typeof v==="number"||(!isNaN(parseFloat(v))&&String(v).match(/^[\d.]+$/))){
+    const n=parseFloat(v);
+    if(n>=0&&n<1){
+      const totalMin=Math.round(n*24*60);
+      const h=Math.floor(totalMin/60);
+      const m=totalMin%60;
+      return String(h).padStart(2,"0")+":"+String(m).padStart(2,"0");
+    }
+  }
   const s=String(v).trim();
+  if(!s)return"";
   // Date型で来た場合（例: "Sat Dec 30 1899 05:00:00 GMT+0900"）
   if(s.includes(" ")||s.includes("GMT")){
     try{const d=new Date(s);if(!isNaN(d))return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");}catch{}
@@ -718,8 +732,11 @@ async function handleSave(){
     }
   }
 
+  const now=new Date().toISOString().replace("T"," ").substring(0,19);
   const rec={
     id:editIdx>=0?recs[editIdx].id:"fish-"+Date.now(),
+    createdAt:editIdx>=0?(recs[editIdx].createdAt||now):now,
+    updatedAt:now,
     date:ge("inp-date").value,
     target:ge("inp-target").value,
     companion:ge("inp-companion").value,
@@ -749,7 +766,8 @@ async function handleSave(){
   };
 
   const payload={
-    id:rec.id,日付:rec.date,釣りもの:rec.target,同行者:rec.companion,
+    id:rec.id,作成日時:rec.createdAt,更新日時:rec.updatedAt,
+    日付:rec.date,釣りもの:rec.target,同行者:rec.companion,
     船宿:rec.fdName,港:rec.port,連絡先:rec.tel,出船時間:rec.departure,沖揚がり時間:rec.returnTime,
     座席:rec.seat,天気:rec.weather,風向:rec.windDir,風速:rec.windSpeed,
     潮回り:rec.tide,気温:rec.temp,水温:rec.waterTemp,
