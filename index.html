@@ -161,11 +161,11 @@ function showRec(){
           <div style="flex:1">
             <div style="font-size:15px;font-weight:700;color:#e8d48a">${esc(r.fdName)||"船宿不明"}</div>
             <div style="font-size:12px;color:#7aacb8;margin-top:2px">${esc(r.port)}${r.seat?" · "+esc(r.seat):""}</div>
-            ${r.memo?`<div style="font-size:12px;color:#c8a830;margin-top:3px">📝 ${esc(r.memo.substring(0,30))}${r.memo.length>30?"…":""}</div>`:""}
+            ${r.target?`<div style="font-size:12px;color:#c8a830;margin-top:3px">🎯 ${esc(r.target)}</div>`:""}
             <div style="font-size:12px;color:#aac8d8;margin-top:3px">🐟 ${esc(fsum(r.fish))}</div>
           </div>
           <div style="text-align:right;font-size:11px;color:#4a7a98;flex-shrink:0;margin-left:8px">
-            <div>${r.date||""}</div>
+            <div style="font-size:12px;font-weight:600;color:#7aacb8">${r.date||""}</div>
             <div style="margin-top:2px">${r.weather||""}</div>
             <div>${r.tide||""}</div>
           </div>
@@ -188,8 +188,11 @@ function showDet(i){
   ge("page-det").innerHTML=`
     <div class="card" style="border-color:rgba(180,150,60,0.4)">
       <div style="font-size:18px;font-weight:700;color:#e8d48a">${esc(r.fdName)||"船宿不明"}</div>
-      <div style="font-size:12px;color:#6a9ab8;margin-top:3px">${esc(r.date)}　${esc(r.port)}　${esc(r.seat)}</div>
+      <div style="font-size:13px;color:#c8a830;margin-top:4px">📅 ${esc(r.date)}</div>
+      ${r.target?`<div style="font-size:13px;color:#c8a830;margin-top:2px">🎯 ${esc(r.target)}</div>`:""}
+      <div style="font-size:12px;color:#6a9ab8;margin-top:4px">${esc(r.port)}${r.seat?"　"+esc(r.seat):""}</div>
       ${r.tel?`<div style="font-size:12px;color:#5a8aaa;margin-top:2px">📞 ${esc(r.tel)}</div>`:""}
+      ${r.companion?`<div style="font-size:12px;color:#7aacb8;margin-top:2px">👥 ${esc(r.companion)}</div>`:""}
     </div>
     <div class="card"><div class="sec">🐟 釣果</div>
       ${(r.fish||[]).map(f=>`<div style="display:flex;gap:12px;padding:8px 0;border-bottom:1px solid rgba(120,160,190,0.1);font-size:13px;align-items:center">
@@ -200,6 +203,7 @@ function showDet(i){
       </div>`).join("")}
     </div>
     <div class="card"><div class="sec">🌊 状況</div>
+      ${dr("釣りもの",r.target)}
       ${dr("天気",r.weather)}
       ${dr("風向",r.windDir)}
       ${dr("風速",r.windSpeed?r.windSpeed+"m/s":"")}
@@ -236,6 +240,8 @@ function showAdd(){
     <div class="card">
       <div class="sec">📅 基本情報</div>
       <div class="field"><label class="lbl">日付</label><input type="date" id="inp-date" value="${today}"></div>
+      <div class="field"><label class="lbl">釣りもの</label><input type="text" id="inp-target" placeholder="例：マダイ、LTアジ、タイラバ…"></div>
+      <div class="field"><label class="lbl">同行者</label><input type="text" id="inp-companion" placeholder="例：田中さん、釣り仲間3名…"></div>
       <div class="field"><label class="lbl">天気</label><div class="chips" id="chips-weather"></div></div>
       <div class="g2">
         <div class="field"><label class="lbl">風向</label><div class="chips" id="chips-windDir" style="gap:4px"></div></div>
@@ -443,6 +449,8 @@ async function handleSave(){
   const rec={
     id:Date.now(),
     date:ge("inp-date").value,
+    target:ge("inp-target").value,
+    companion:ge("inp-companion").value,
     fdName:ge("inp-fdName").value,
     port:ge("inp-port").value,
     tel:ge("inp-tel").value,
@@ -479,7 +487,7 @@ async function sendSheet(rec){
   try{
     const fs=rec.fish.map(f=>`${f.species}${f.length?" "+f.length+"cm":""}${f.weight?" "+f.weight+"g":""} ×${f.count}匹`).join(" / ");
     await fetch(gasUrl,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({日付:rec.date,船宿:rec.fdName,港:rec.port,連絡先:rec.tel,座席:rec.seat,天気:rec.weather,風向:rec.windDir,風速:rec.windSpeed,潮回り:rec.tide,気温:rec.temp,水温:rec.waterTemp,竿:rec.rod,リール:rec.reel,道糸号数:rec.line,仕掛け:rec.shikake,ハリス号数:rec.harisGo,ハリス長さm:rec.harisM,針種類:rec.hookType,針サイズ号:rec.hookSize,オモリ号:rec.omori,釣果:fs,メモ:rec.memo})
+      body:JSON.stringify({日付:rec.date,釣りもの:rec.target,同行者:rec.companion,船宿:rec.fdName,港:rec.port,連絡先:rec.tel,座席:rec.seat,天気:rec.weather,風向:rec.windDir,風速:rec.windSpeed,潮回り:rec.tide,気温:rec.temp,水温:rec.waterTemp,竿:rec.rod,リール:rec.reel,道糸号数:rec.line,仕掛け:rec.shikake,ハリス号数:rec.harisGo,ハリス長さm:rec.harisM,針種類:rec.hookType,針サイズ号:rec.hookSize,オモリ号:rec.omori,釣果:fs,メモ:rec.memo})
     });
   }catch(e){console.log("GAS error",e);}
 }
