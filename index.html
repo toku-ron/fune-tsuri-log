@@ -11,6 +11,7 @@ body{background:linear-gradient(160deg,#04111d,#081a2e 50%,#051420);min-height:1
 .header-top{display:flex;justify-content:space-between;align-items:center;}
 .title{font-size:18px;font-weight:700;color:#e8d48a;letter-spacing:2px;}
 .subtitle{font-size:10px;color:#6a9ab8;letter-spacing:2px;margin-top:2px;}
+.version{font-size:9px;color:#3a6a88;letter-spacing:1px;margin-top:1px;}
 .tabs{display:flex;margin-top:10px;}
 .tab{padding:8px 14px;font-size:11px;cursor:pointer;border:none;border-radius:5px 5px 0 0;background:transparent;color:#5a8aaa;border-bottom:2px solid transparent;font-family:Georgia,serif;-webkit-tap-highlight-color:transparent;}
 .tab.active{background:rgba(180,150,60,0.18);color:#e8d48a;border-bottom:2px solid #c8a830;}
@@ -19,7 +20,7 @@ body{background:linear-gradient(160deg,#04111d,#081a2e 50%,#051420);min-height:1
 .sec{font-size:10px;letter-spacing:3px;color:#c8a830;text-transform:uppercase;margin-bottom:12px;}
 .lbl{display:block;font-size:10px;letter-spacing:2px;color:#7aacb8;margin-bottom:5px;}
 .field{margin-bottom:13px;}
-input[type=text],input[type=number],input[type=date],input[type=tel],textarea{width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(120,160,190,0.22);border-radius:8px;color:#d4e8f4;padding:10px 12px;font-size:14px;outline:none;box-sizing:border-box;font-family:Georgia,serif;-webkit-appearance:none;}
+input[type=text],input[type=number],input[type=date],input[type=tel],input[type=time],textarea{width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(120,160,190,0.22);border-radius:8px;color:#d4e8f4;padding:10px 12px;font-size:14px;outline:none;box-sizing:border-box;font-family:Georgia,serif;-webkit-appearance:none;}
 textarea{resize:vertical;height:80px;}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px;}
 .chip{padding:8px 14px;border-radius:20px;font-size:12px;cursor:pointer;background:rgba(255,255,255,0.04);border:1px solid rgba(120,160,190,0.18);color:#7aacb8;-webkit-tap-highlight-color:transparent;touch-action:manipulation;user-select:none;}
@@ -29,21 +30,26 @@ textarea{resize:vertical;height:80px;}
 .btn-danger{background:rgba(150,30,30,0.18);border:1px solid rgba(160,40,40,0.32);color:#e09090;border-radius:8px;padding:9px 16px;cursor:pointer;font-size:13px;font-family:Georgia,serif;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
 .btn-full{width:100%;margin-top:4px;}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
 .rec-card{background:rgba(255,255,255,0.03);border:1px solid rgba(180,150,60,0.15);border-radius:11px;padding:14px 16px;margin-bottom:11px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
 .fd-card{background:rgba(255,255,255,0.03);border:1px solid rgba(180,150,60,0.15);border-radius:11px;padding:13px 15px;margin-bottom:9px;}
 .fish-card{background:rgba(0,0,0,0.2);border:1px solid rgba(120,160,190,0.15);border-radius:9px;padding:14px;margin-bottom:9px;}
 .dr{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(120,160,190,0.08);font-size:13px;}
 .dl{color:#6a9ab8;}.dv{color:#d4e8f4;}
-.empty{text-align:center;padding:70px 0;color:#3a6a88;}
+.empty{text-align:center;padding:60px 0;color:#3a6a88;}
 .stepper{display:inline-flex;align-items:center;background:rgba(255,255,255,0.05);border:1px solid rgba(120,160,190,0.2);border-radius:8px;overflow:hidden;}
 .stepper button{background:none;border:none;color:#7aacb8;font-size:20px;padding:6px 16px;cursor:pointer;font-family:Georgia,serif;line-height:1;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
 .stepper span{color:#d4e8f4;font-size:16px;font-weight:700;min-width:36px;text-align:center;}
-.code-box{background:#020a12;border:1px solid rgba(120,160,190,0.18);border-radius:7px;padding:12px;font-size:11px;color:#7aecb8;font-family:monospace;line-height:1.7;white-space:pre-wrap;margin-bottom:8px;word-break:break-all;}
+.loading{text-align:center;padding:60px 0;color:#5a8aaa;}
+.loading-spin{font-size:36px;display:block;margin-bottom:12px;animation:spin 1.5s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.no-gas{text-align:center;padding:50px 20px;color:#5a8aaa;}
 .steps{background:rgba(0,0,0,0.3);border-radius:9px;padding:14px;margin-bottom:14px;font-size:13px;line-height:2.2;color:#aac8d8;}
+.code-box{background:#020a12;border:1px solid rgba(120,160,190,0.18);border-radius:7px;padding:12px;font-size:11px;color:#7aecb8;font-family:monospace;line-height:1.7;white-space:pre-wrap;margin-bottom:8px;word-break:break-all;}
 .hidden{display:none;}
 .add-fish-inp{display:flex;gap:7px;margin-top:8px;}
 .add-fish-inp input{flex:1;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(180,150,60,0.95);color:#fff8e0;padding:10px 24px;border-radius:20px;font-size:13px;z-index:100;pointer-events:none;opacity:0;transition:opacity 0.3s;}
+.toast.show{opacity:1;}
 </style>
 </head>
 <body>
@@ -51,8 +57,8 @@ textarea{resize:vertical;height:80px;}
   <div class="header-top">
     <div>
       <div class="title">⚓ 船釣りログ</div>
-      <div class="subtitle" id="subtitle">0 RECORDS</div>
-      <div style="font-size:9px;color:#3a6a88;letter-spacing:1px;margin-top:1px">v2.0.0 · 船釣りログ</div>
+      <div class="subtitle" id="subtitle">読み込み中…</div>
+      <div class="version">v3.0.0 · Google Sheets連携</div>
     </div>
     <div id="hbtn"></div>
   </div>
@@ -69,9 +75,10 @@ textarea{resize:vertical;height:80px;}
 <div class="wrap hidden" id="page-fd"></div>
 <div class="wrap hidden" id="page-fdform"></div>
 <div class="wrap hidden" id="page-set"></div>
+<div class="toast" id="toast"></div>
 
 <script>
-const SK_R="fune-r7",SK_F="fune-f7",SK_G="fune-g7",SK_FISH="fune-fish7";
+const SK_G="fune-gas-v8", SK_F="fune-fd-v8", SK_FISH="fune-fish-v8";
 
 const SEATS=["右舷 みよし","右舷 胴の間","右舷 とも","左舷 みよし","左舷 胴の間","左舷 とも","その他"];
 const WEATHER=["☀️ 晴れ","⛅ 曇り","🌧️ 雨"];
@@ -80,24 +87,78 @@ const TIDE=["大潮","中潮","小潮","長潮","若潮"];
 const SHIKAKE=["天秤仕掛け","胴付き仕掛け","コマセ仕掛け","泳がせ仕掛け","落とし込み","ルアー","テンヤ","タイラバ","その他"];
 const HOOKS=["丸セイゴ","チヌ針","伊勢尼","袖針","ムツ針","メバル針","カワハギ針","タイ針","ヒラマサ針","その他"];
 const DEFAULT_FISH=["マダイ","アジ","サバ","イサキ","ヒラメ","カレイ","メバル","カサゴ","ワラサ","ブリ","スズキ","マゴチ","タチウオ","キス","アマダイ","オニカサゴ","カワハギ","クロダイ","マハタ","イカ","タコ"];
-const GAS_CODE=`function doPost(e) {\n  const sheet = SpreadsheetApp\n    .getActiveSpreadsheet().getActiveSheet();\n  const data = JSON.parse(e.postData.contents);\n  if (sheet.getLastRow() === 0) {\n    sheet.appendRow(Object.keys(data));\n  }\n  sheet.appendRow(Object.values(data));\n  return ContentService.createTextOutput("ok")\n    .setMimeType(ContentService.MimeType.TEXT);\n}`;
+const GAS_CODE=`function doPost(e) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const data = JSON.parse(e.postData.contents);
+  const action = data._action;
 
-let recs=[],fds=[],gasUrl="",customFishDB=[];
+  if (action === "delete") {
+    const rows = sheet.getDataRange().getValues();
+    for (let i = rows.length - 1; i >= 1; i--) {
+      if (String(rows[i][0]) === String(data._id)) {
+        sheet.deleteRow(i + 1); break;
+      }
+    }
+    return ContentService.createTextOutput("ok").setMimeType(ContentService.MimeType.TEXT);
+  }
 
-function load(){
-  try{const r=localStorage.getItem(SK_R);if(r)recs=JSON.parse(r);}catch{}
-  try{const f=localStorage.getItem(SK_F);if(f)fds=JSON.parse(f);}catch{}
-  try{const g=localStorage.getItem(SK_G);if(g)gasUrl=g;}catch{}
-  try{const cf=localStorage.getItem(SK_FISH);if(cf)customFishDB=JSON.parse(cf);}catch{}
+  if (action === "update") {
+    const rows = sheet.getDataRange().getValues();
+    const headers = rows[0];
+    for (let i = 1; i < rows.length; i++) {
+      if (String(rows[i][0]) === String(data._id)) {
+        headers.forEach((h, j) => {
+          if (h && data[h] !== undefined) sheet.getRange(i+1, j+1).setValue(data[h]);
+        });
+        break;
+      }
+    }
+    return ContentService.createTextOutput("ok").setMimeType(ContentService.MimeType.TEXT);
+  }
+
+  if (sheet.getLastRow() === 0) sheet.appendRow(Object.keys(data));
+  sheet.appendRow(Object.values(data));
+  return ContentService.createTextOutput("ok").setMimeType(ContentService.MimeType.TEXT);
 }
-function saveRecs(){try{localStorage.setItem(SK_R,JSON.stringify(recs));}catch{}}
+
+function doGet(e) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const rows = sheet.getDataRange().getValues();
+  if (rows.length <= 1) return ContentService.createTextOutput("[]").setMimeType(ContentService.MimeType.JSON);
+  const headers = rows[0];
+  const records = rows.slice(1).map(row => {
+    const obj = {};
+    headers.forEach((h, i) => { obj[h] = row[i]; });
+    return obj;
+  });
+  return ContentService.createTextOutput(JSON.stringify(records)).setMimeType(ContentService.MimeType.JSON);
+}`;
+
+let gasUrl="", recs=[], fds=[], customFishDB=[];
+let curTab="rec", editIdx=-1;
+let sel={}, fishSel=[], fishCounts=[], fishCount=1;
+
+// ===== 初期化 =====
+function init(){
+  try{const g=localStorage.getItem(SK_G);if(g)gasUrl=g;}catch{}
+  try{const f=localStorage.getItem(SK_F);if(f)fds=JSON.parse(f);}catch{}
+  try{const cf=localStorage.getItem(SK_FISH);if(cf)customFishDB=JSON.parse(cf);}catch{}
+  showPage("rec");
+  if(gasUrl) loadFromSheet();
+  else showRec();
+}
+
+function ge(id){return document.getElementById(id);}
+function esc(s){return s?String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"):""}
 function saveFds(){try{localStorage.setItem(SK_F,JSON.stringify(fds));}catch{}}
 function saveFishDB(){try{localStorage.setItem(SK_FISH,JSON.stringify(customFishDB));}catch{}}
 function getFishList(){return [...DEFAULT_FISH,...customFishDB.filter(f=>!DEFAULT_FISH.includes(f))];}
 function addToFishDB(name){if(name&&!DEFAULT_FISH.includes(name)&&!customFishDB.includes(name)){customFishDB.push(name);saveFishDB();}}
 
-function ge(id){return document.getElementById(id);}
-function esc(s){return s?String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"):""}
+function toast(msg){
+  const t=ge("toast");t.textContent=msg;t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),2500);
+}
 
 function showPage(p){
   ["rec","det","add","fd","fdform","set"].forEach(id=>ge("page-"+id).classList.add("hidden"));
@@ -106,46 +167,91 @@ function showPage(p){
 }
 
 function switchTab(t){
+  curTab=t;
   ["rec","fd","set"].forEach(k=>ge("tab-"+k).classList.toggle("active",k===t));
   if(t==="rec")showRec();
   else if(t==="fd")showFd();
   else showSet();
 }
 
-function updateSubtitle(){ge("subtitle").textContent=recs.length+" RECORDS";}
-
-// チップ初期化
-function initChips(containerId,list,selKey,state,extraFn){
-  const c=ge(containerId);if(!c)return;
-  c.innerHTML="";
-  list.forEach(s=>{
-    const sp=document.createElement("span");
-    sp.className="chip"+(state[selKey]===s?" on":"");
-    sp.textContent=s;
-    sp.addEventListener("click",function(){
-      c.querySelectorAll(".chip").forEach(x=>x.classList.remove("on"));
-      sp.classList.add("on");
-      state[selKey]=s;
-      if(extraFn)extraFn(s);
-    });
-    c.appendChild(sp);
-  });
+function updateSubtitle(){
+  ge("subtitle").textContent=recs.length+" RECORDS"+(gasUrl?"":" · ⚠️ GAS未設定");
 }
 
-function initFishChips(containerId,list,idx,fishSel){
-  const c=ge(containerId);if(!c)return;
-  c.innerHTML="";
-  list.forEach(s=>{
-    const sp=document.createElement("span");
-    sp.className="chip"+(fishSel[idx]===s?" on":"");
-    sp.textContent=s;
-    sp.addEventListener("click",function(){
-      c.querySelectorAll(".chip").forEach(x=>x.classList.remove("on"));
-      sp.classList.add("on");
-      fishSel[idx]=s;
-    });
-    c.appendChild(sp);
-  });
+// ===== Google Sheets 読み込み =====
+async function loadFromSheet(){
+  ge("page-rec").innerHTML=`<div class="loading"><span class="loading-spin">⚓</span>データを読み込み中…</div>`;
+  ge("hbtn").innerHTML="";
+  showPage("rec");
+  try{
+    const res=await fetch(gasUrl+"?t="+Date.now());
+    const data=await res.json();
+    // スプレッドシートの行をrecオブジェクトに変換
+    recs=data.map(row=>({
+      id:row["id"]||row["ID"]||String(Math.random()),
+      date:row["日付"]||"",
+      target:row["釣りもの"]||"",
+      companion:row["同行者"]||"",
+      fdName:row["船宿"]||"",
+      port:row["港"]||"",
+      tel:row["連絡先"]||"",
+      departure:row["出船時間"]||"",
+      seat:row["座席"]||"",
+      weather:row["天気"]||"",
+      windDir:row["風向"]||"",
+      windSpeed:row["風速"]||"",
+      tide:row["潮回り"]||"",
+      temp:row["気温"]||"",
+      waterTemp:row["水温"]||"",
+      rod:row["竿"]||"",
+      reel:row["リール"]||"",
+      line:row["道糸号数"]||"",
+      shikake:row["仕掛け"]||"",
+      harisGo:row["ハリス号数"]||"",
+      harisM:row["ハリス長さm"]||"",
+      hookType:row["針種類"]||"",
+      hookSize:row["針サイズ号"]||"",
+      omori:row["オモリ号"]||"",
+      memo:row["メモ"]||"",
+      fish:parseFish(row["釣果"]||""),
+    })).reverse(); // 新しい順
+    updateSubtitle();
+    showRec();
+  }catch(e){
+    ge("page-rec").innerHTML=`<div class="empty"><div style="font-size:36px;margin-bottom:12px">⚠️</div><div style="color:#e09090;margin-bottom:8px">データの読み込みに失敗しました</div><div style="font-size:12px">GASのURLを確認してください</div><button class="btn-ghost" style="margin-top:16px" onclick="loadFromSheet()">再試行</button></div>`;
+    ge("hbtn").innerHTML=`<button class="btn-gold" onclick="showAdd()">＋ 記録</button>`;
+  }
+}
+
+// "マダイ 35cm 800g ×2匹 / アジ ×5匹" → fish配列
+function parseFish(str){
+  if(!str)return[];
+  return str.split(" / ").map(s=>{
+    const count=parseInt((s.match(/×(\d+)/)||[0,1])[1])||1;
+    const length=(s.match(/(\d+\.?\d*)cm/)||["",""])[1];
+    const weight=(s.match(/(\d+\.?\d*)g/)||["",""])[1];
+    const species=s.split(" ")[0]||"";
+    return{species,length,weight,count};
+  }).filter(f=>f.species);
+}
+
+// fish配列 → "マダイ 35cm 800g ×2匹 / アジ ×5匹"
+function fishToStr(fish){
+  return fish.map(f=>`${f.species}${f.length?" "+f.length+"cm":""}${f.weight?" "+f.weight+"g":""} ×${f.count}匹`).join(" / ");
+}
+
+function fsum(fish){
+  const r=(fish||[]).filter(f=>f.species).map(f=>`${f.species}×${f.count}`).join(" / ");
+  return r||"釣果なし";
+}
+
+// ===== GAS送信 =====
+async function gasPost(payload){
+  if(!gasUrl)return false;
+  try{
+    await fetch(gasUrl,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+    return true;
+  }catch(e){console.log("GAS error",e);return false;}
 }
 
 // ===== 釣行一覧 =====
@@ -153,32 +259,33 @@ function showRec(){
   updateSubtitle();
   ge("hbtn").innerHTML=`<button class="btn-gold" onclick="showAdd()">＋ 記録</button>`;
   const m=ge("page-rec");
-  if(!recs.length){
-    m.innerHTML=`<div class="empty"><div style="font-size:48px;margin-bottom:12px">⚓</div><div style="color:#5a8aaa;font-size:15px">まだ記録がありません</div><div style="font-size:12px;margin-top:6px">「＋ 記録」から追加しましょう</div></div>`;
-  } else {
-    m.innerHTML=recs.map((r,i)=>`
-      <div class="rec-card" onclick="showDet(${i})">
-        <div style="display:flex;justify-content:space-between">
-          <div style="flex:1">
-            <div style="font-size:15px;font-weight:700;color:#e8d48a">${esc(r.fdName)||"船宿不明"}</div>
-            <div style="font-size:12px;color:#7aacb8;margin-top:2px">${esc(r.port)}${r.seat?" · "+esc(r.seat):""}</div>
-            ${r.target?`<div style="font-size:12px;color:#c8a830;margin-top:3px">🎯 ${esc(r.target)}</div>`:""}
-            <div style="font-size:12px;color:#aac8d8;margin-top:3px">🐟 ${esc(fsum(r.fish))}</div>
-          </div>
-          <div style="text-align:right;font-size:11px;color:#4a7a98;flex-shrink:0;margin-left:8px">
-            <div style="font-size:12px;font-weight:600;color:#7aacb8">${r.date||""}</div>
-            <div style="margin-top:2px">${r.weather||""}</div>
-            <div>${r.tide||""}</div>
-          </div>
-        </div>
-      </div>`).join("");
+  if(!gasUrl){
+    m.innerHTML=`<div class="no-gas"><div style="font-size:36px;margin-bottom:12px">⚙️</div><div style="color:#e8d48a;font-size:15px;margin-bottom:8px">まずGASを設定してください</div><div style="font-size:13px;margin-bottom:16px">⚙️ 設定タブからGoogle Apps ScriptのURLを登録すると<br>データが保存・表示されます</div><button class="btn-gold" onclick="switchTab('set')">⚙️ 設定する</button></div>`;
+    showPage("rec");return;
   }
+  if(!recs.length){
+    m.innerHTML=`<div class="empty"><div style="font-size:48px;margin-bottom:12px">⚓</div><div style="color:#5a8aaa;font-size:15px">まだ記録がありません</div><div style="font-size:12px;margin-top:6px">「＋ 記録」から追加しましょう</div><br><button class="btn-ghost" onclick="loadFromSheet()" style="margin-top:8px">🔄 再読み込み</button></div>`;
+    showPage("rec");return;
+  }
+  m.innerHTML=`
+    <button class="btn-ghost btn-full" style="margin-bottom:12px;font-size:12px" onclick="loadFromSheet()">🔄 最新データを読み込む</button>`+
+    recs.map((r,i)=>`
+    <div class="rec-card" onclick="showDet(${i})">
+      <div style="display:flex;justify-content:space-between">
+        <div style="flex:1">
+          <div style="font-size:15px;font-weight:700;color:#e8d48a">${esc(r.fdName)||"船宿不明"}</div>
+          <div style="font-size:12px;color:#7aacb8;margin-top:2px">${esc(r.port)}${r.seat?" · "+esc(r.seat):""}</div>
+          ${r.target?`<div style="font-size:12px;color:#c8a830;margin-top:3px">🎯 ${esc(r.target)}</div>`:""}
+          <div style="font-size:12px;color:#aac8d8;margin-top:3px">🐟 ${esc(fsum(r.fish))}</div>
+        </div>
+        <div style="text-align:right;font-size:11px;color:#4a7a98;flex-shrink:0;margin-left:8px">
+          <div style="font-size:12px;font-weight:600;color:#7aacb8">${esc(r.date)}</div>
+          <div style="margin-top:2px">${esc(r.weather)}</div>
+          <div>${esc(r.tide)}</div>
+        </div>
+      </div>
+    </div>`).join("");
   showPage("rec");
-}
-
-function fsum(fish){
-  const r=(fish||[]).filter(f=>f.species).map(f=>`${f.species}×${f.count}`).join(" / ");
-  return r||"釣果なし";
 }
 
 // ===== 詳細 =====
@@ -201,291 +308,220 @@ function showDet(i){
       ${r.companion?`<div style="font-size:12px;color:#7aacb8;margin-top:2px">👥 ${esc(r.companion)}</div>`:""}
     </div>
     <div class="card"><div class="sec">🐟 釣果</div>
-      ${(r.fish||[]).map(f=>`<div style="display:flex;gap:12px;padding:8px 0;border-bottom:1px solid rgba(120,160,190,0.1);font-size:13px;align-items:center">
-        <span style="color:#e8d48a;font-weight:700;min-width:80px">${esc(f.species)||"—"}</span>
-        ${f.length?`<span style="color:#aac8d8">${f.length}cm</span>`:""}
-        ${f.weight?`<span style="color:#aac8d8">${f.weight}g</span>`:""}
-        <span style="color:#7aacb8;margin-left:auto">×${f.count}匹</span>
-      </div>`).join("")}
+      ${(r.fish||[]).length?
+        (r.fish||[]).map(f=>`<div style="display:flex;gap:12px;padding:8px 0;border-bottom:1px solid rgba(120,160,190,0.1);font-size:13px;align-items:center">
+          <span style="color:#e8d48a;font-weight:700;min-width:80px">${esc(f.species)||"—"}</span>
+          ${f.length?`<span style="color:#aac8d8">${f.length}cm</span>`:""}
+          ${f.weight?`<span style="color:#aac8d8">${f.weight}g</span>`:""}
+          <span style="color:#7aacb8;margin-left:auto">×${f.count}匹</span>
+        </div>`).join("")
+        :`<div style="color:#5a8aaa;font-size:13px">釣果なし</div>`}
     </div>
     <div class="card"><div class="sec">🌊 状況</div>
-      ${dr("釣りもの",r.target)}
-      ${dr("天気",r.weather)}
-      ${dr("風向",r.windDir)}
+      ${dr("天気",r.weather)}${dr("風向",r.windDir)}
       ${dr("風速",r.windSpeed?r.windSpeed+"m/s":"")}
       ${dr("潮回り",r.tide)}
-      ${dr("気温",r.temp?r.temp+"℃":"")}
-      ${dr("水温",r.waterTemp?r.waterTemp+"℃":"")}
+      ${dr("気温",r.temp?r.temp+"℃":"")}${dr("水温",r.waterTemp?r.waterTemp+"℃":"")}
     </div>
     ${(r.rod||r.reel||r.line)?`<div class="card"><div class="sec">🎣 タックル</div>${dr("竿",r.rod)}${dr("リール",r.reel)}${dr("道糸",r.line?r.line+"号":"")}</div>`:""}
     ${(r.shikake||r.harisGo||r.hookType||r.omori)?`<div class="card"><div class="sec">🪝 仕掛け</div>${dr("種類",r.shikake)}${dr("ハリス",r.harisGo?r.harisGo+"号"+(r.harisM?" "+r.harisM+"m":""):"")}${dr("針",r.hookType?r.hookType+(r.hookSize?" "+r.hookSize+"号":""):"")}${dr("オモリ",r.omori?r.omori+"号":"")}</div>`:""}
     ${r.memo?`<div class="card"><div class="sec">📝 メモ</div><div style="font-size:13px;color:#b0ccd8;line-height:1.8">${esc(r.memo)}</div></div>`:""}
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px">
-      <button class="btn-ghost btn-full" onclick="showEdit(${i})">✏️ この記録を編集</button>
-      <button class="btn-danger btn-full" onclick="delRec(${i})">🗑️ 削除する</button>
-    </div>`;
+    <button class="btn-danger btn-full" id="del-btn">🗑️ この記録を削除する</button>`;
+  ge("del-btn").addEventListener("click",function(){delRec(i);});
   showPage("det");
 }
 
-function delRec(i){if(!confirm("削除しますか？"))return;recs.splice(i,1);saveRecs();showRec();}
-
-// ===== 編集モード =====
-let editIdx=-1; // -1=新規, 0以上=編集対象インデックス
-
-function showEdit(i){
+async function delRec(i){
+  if(!confirm("この記録を削除しますか？"))return;
   const r=recs[i];
-  editIdx=i;
+  ge("del-btn").textContent="削除中…";
+  await gasPost({_action:"delete",_id:r.id});
+  recs.splice(i,1);
+  updateSubtitle();
+  toast("削除しました");
+  showRec();
+}
 
-  sel={
-    weather:r.weather||"",
-    windDir:r.windDir||"",
-    tide:r.tide||"",
-    seat:r.seat||"",
-    shikake:r.shikake||"",
-    hookType:r.hookType||""
-  };
-  fishSel=(r.fish||[]).map(f=>f.species||"");
-  fishCounts=(r.fish||[]).map(f=>f.count||1);
-  fishCount=Math.max(1,(r.fish||[]).length);
+// ===== チップ =====
+function initChips(containerId,list,selKey,extraFn){
+  const c=ge(containerId);if(!c)return;
+  c.innerHTML="";
+  list.forEach(s=>{
+    const sp=document.createElement("span");
+    sp.className="chip"+(sel[selKey]===s?" on":"");
+    sp.textContent=s;
+    sp.addEventListener("click",function(){
+      c.querySelectorAll(".chip").forEach(x=>x.classList.remove("on"));
+      sp.classList.add("on");sel[selKey]=s;
+      if(extraFn)extraFn(s);
+    });
+    c.appendChild(sp);
+  });
+}
 
-  ge("hbtn").innerHTML=`<button class="btn-ghost" onclick="showDet(${i})">← 戻る</button>`;
-  const m=ge("page-add");
+function initFishChips(containerId,list,idx){
+  const c=ge(containerId);if(!c)return;
+  c.innerHTML="";
+  list.forEach(s=>{
+    const sp=document.createElement("span");
+    sp.className="chip"+(fishSel[idx]===s?" on":"");
+    sp.textContent=s;
+    sp.addEventListener("click",function(){
+      c.querySelectorAll(".chip").forEach(x=>x.classList.remove("on"));
+      sp.classList.add("on");fishSel[idx]=s;
+    });
+    c.appendChild(sp);
+  });
+}
 
-  m.innerHTML=`
-    <h2 style="font-size:16px;color:#e8d48a;letter-spacing:2px;margin-bottom:18px">✏️ 釣行記録を編集</h2>
-
+// ===== フォーム =====
+function buildForm(r){
+  // r=null なら新規、r=object なら編集
+  const v=k=>r?esc(r[k]||""):"";
+  const today=new Date().toISOString().split("T")[0];
+  return `
     <div class="card">
       <div class="sec">📅 基本情報</div>
-      <div class="field"><label class="lbl">日付</label><input type="date" id="inp-date" value="${esc(r.date)}"></div>
-      <div class="field"><label class="lbl">釣りもの</label><input type="text" id="inp-target" placeholder="例：マダイ、LTアジ…" value="${esc(r.target||"")}"></div>
-      <div class="field"><label class="lbl">同行者</label><input type="text" id="inp-companion" placeholder="例：田中さん…" value="${esc(r.companion||"")}"></div>
+      <div class="field"><label class="lbl">日付</label><input type="date" id="inp-date" value="${r?v("date"):today}"></div>
+      <div class="field"><label class="lbl">釣りもの</label><input type="text" id="inp-target" placeholder="例：マダイ、LTアジ…" value="${v("target")}"></div>
+      <div class="field"><label class="lbl">同行者</label><input type="text" id="inp-companion" placeholder="例：田中さん…" value="${v("companion")}"></div>
     </div>
-
     <div class="card">
       <div class="sec">🏠 船宿</div>
       <div id="fav-fds"></div>
       <div style="display:flex;gap:7px;margin-bottom:8px">
         <input type="text" id="sq" placeholder="船宿を検索…" style="flex:1">
-        <button class="btn-ghost" data-search style="white-space:nowrap">検索</button>
+        <button class="btn-ghost" id="sq-btn" style="white-space:nowrap">検索</button>
       </div>
       <div id="sr" style="margin-bottom:8px"></div>
-      <div class="field"><label class="lbl">船宿名</label><input type="text" id="inp-fdName" placeholder="〇〇丸" value="${esc(r.fdName||"")}"></div>
+      <div class="field"><label class="lbl">船宿名</label><input type="text" id="inp-fdName" placeholder="〇〇丸" value="${v("fdName")}"></div>
       <div class="g2">
-        <div class="field"><label class="lbl">港</label><input type="text" id="inp-port" placeholder="〇〇港" value="${esc(r.port||"")}"></div>
-        <div class="field"><label class="lbl">連絡先</label><input type="tel" id="inp-tel" placeholder="電話番号" value="${esc(r.tel||"")}"></div>
+        <div class="field"><label class="lbl">港</label><input type="text" id="inp-port" placeholder="〇〇港" value="${v("port")}"></div>
+        <div class="field"><label class="lbl">連絡先</label><input type="tel" id="inp-tel" placeholder="電話番号" value="${v("tel")}"></div>
       </div>
-      <div class="field"><label class="lbl">出船時間</label><input type="time" id="inp-departure" value="${esc(r.departure||"")}"></div>
+      <div class="field"><label class="lbl">出船時間</label><input type="time" id="inp-departure" value="${v("departure")}"></div>
+      <button class="btn-ghost" id="save-fd-btn" style="font-size:12px;padding:7px 14px">＋ 船宿リストに保存</button>
     </div>
-
     <div class="card">
       <div class="sec">🌤️ 天候</div>
       <div style="margin-bottom:12px">
-        <button class="btn-ghost btn-full" id="weather-btn" onclick="fetchWeather()">📍 現在地の天候を自動取得</button>
+        <button class="btn-ghost btn-full" id="weather-btn">📍 現在地の天候を自動取得</button>
         <div id="weather-status" style="font-size:11px;color:#6a9ab8;margin-top:6px;text-align:center"></div>
       </div>
       <div class="field"><label class="lbl">天気</label><div class="chips" id="chips-weather"></div></div>
       <div class="g2">
         <div class="field"><label class="lbl">風向</label><div class="chips" id="chips-windDir" style="gap:4px"></div></div>
-        <div class="field"><label class="lbl">風速 (m/s)</label><input type="number" id="inp-windSpeed" placeholder="5" step="0.5" value="${esc(r.windSpeed||"")}"></div>
+        <div class="field"><label class="lbl">風速 (m/s)</label><input type="number" id="inp-windSpeed" placeholder="5" step="0.5" value="${v("windSpeed")}"></div>
       </div>
       <div class="g2">
-        <div class="field"><label class="lbl">気温(℃)</label><input type="number" id="inp-temp" placeholder="20" value="${esc(r.temp||"")}"></div>
-        <div class="field"><label class="lbl">水温(℃)</label><input type="number" id="inp-waterTemp" placeholder="18" value="${esc(r.waterTemp||"")}"></div>
+        <div class="field"><label class="lbl">気温(℃)</label><input type="number" id="inp-temp" placeholder="20" value="${v("temp")}"></div>
+        <div class="field"><label class="lbl">水温(℃)</label><input type="number" id="inp-waterTemp" placeholder="18" value="${v("waterTemp")}"></div>
       </div>
       <div class="field"><label class="lbl">潮回り</label><div class="chips" id="chips-tide"></div></div>
     </div>
-
     <div class="card">
       <div class="sec">🚢 乗船位置</div>
       <div class="field"><label class="lbl">座席</label><div class="chips" id="chips-seat"></div></div>
     </div>
-
     <div class="card">
       <div class="sec">🎣 タックル</div>
-      <div class="field"><label class="lbl">竿</label><input type="text" id="inp-rod" value="${esc(r.rod||"")}" placeholder="例：シマノ 深海 200-300"></div>
-      <div class="field"><label class="lbl">リール</label><input type="text" id="inp-reel" value="${esc(r.reel||"")}" placeholder="例：フォースマスター 600"></div>
-      <div class="field"><label class="lbl">道糸（号）</label><input type="number" id="inp-line" step="0.1" value="${esc(r.line||"")}"></div>
+      <div class="field"><label class="lbl">竿</label><input type="text" id="inp-rod" placeholder="例：シマノ 深海 200-300" value="${v("rod")}"></div>
+      <div class="field"><label class="lbl">リール</label><input type="text" id="inp-reel" placeholder="例：フォースマスター 600" value="${v("reel")}"></div>
+      <div class="field"><label class="lbl">道糸（号）</label><input type="number" id="inp-line" step="0.1" placeholder="3" value="${v("line")}"></div>
     </div>
-
     <div class="card">
       <div class="sec">🪝 仕掛け</div>
       <div class="field"><label class="lbl">仕掛けの種類</label><div class="chips" id="chips-shikake"></div></div>
       <div class="g2">
-        <div class="field"><label class="lbl">ハリス号数</label><input type="number" id="inp-harisGo" step="0.1" value="${esc(r.harisGo||"")}"></div>
-        <div class="field"><label class="lbl">ハリス長さ(m)</label><input type="number" id="inp-harisM" step="0.5" value="${esc(r.harisM||"")}"></div>
+        <div class="field"><label class="lbl">ハリス号数</label><input type="number" id="inp-harisGo" step="0.1" placeholder="2" value="${v("harisGo")}"></div>
+        <div class="field"><label class="lbl">ハリス長さ(m)</label><input type="number" id="inp-harisM" step="0.5" placeholder="1.5" value="${v("harisM")}"></div>
       </div>
       <div class="field"><label class="lbl">針の種類</label><div class="chips" id="chips-hookType"></div></div>
       <div class="g2">
-        <div class="field"><label class="lbl">針サイズ（号）</label><input type="number" id="inp-hookSize" value="${esc(r.hookSize||"")}"></div>
-        <div class="field"><label class="lbl">オモリ（号）</label><input type="number" id="inp-omori" value="${esc(r.omori||"")}"></div>
+        <div class="field"><label class="lbl">針サイズ（号）</label><input type="number" id="inp-hookSize" placeholder="10" value="${v("hookSize")}"></div>
+        <div class="field"><label class="lbl">オモリ（号）</label><input type="number" id="inp-omori" placeholder="60" value="${v("omori")}"></div>
       </div>
     </div>
-
     <div class="card">
       <div class="sec">🐟 釣果（複数可）</div>
       <div id="fish-list"></div>
-      <button class="btn-ghost btn-full" onclick="addFishRow()">＋ 魚を追加</button>
+      <button class="btn-ghost btn-full" id="add-fish-btn">＋ 魚を追加</button>
     </div>
-
     <div class="card">
       <div class="sec">📝 メモ</div>
-      <textarea id="inp-memo" placeholder="ポイント、タナ、コマセ量など…">${esc(r.memo||"")}</textarea>
+      <textarea id="inp-memo" placeholder="ポイント、タナ、コマセ量など…">${r?esc(r.memo||""):""}</textarea>
     </div>
+    <button class="btn-gold btn-full" id="savebtn">${r?"変更を保存する":"航海記録を保存する"}</button>`;
+}
 
-    <button class="btn-gold btn-full" id="savebtn" onclick="handleSave()">変更を保存する</button>`;
+function initForm(r){
+  ge("page-add").innerHTML=`
+    <h2 style="font-size:16px;color:#e8d48a;letter-spacing:2px;margin-bottom:18px">${r?"✏️ 釣行記録を編集":"⚓ 新しい釣行を記録"}</h2>`+buildForm(r);
 
-  initChips("chips-weather",WEATHER,"weather",sel,null);
-  initChips("chips-windDir",WIND_DIR,"windDir",sel,null);
-  initChips("chips-tide",TIDE,"tide",sel,null);
-  initChips("chips-seat",SEATS,"seat",sel,null);
-  initChips("chips-shikake",SHIKAKE,"shikake",sel,null);
-  initChips("chips-hookType",HOOKS,"hookType",sel,null);
+  initChips("chips-weather",WEATHER,"weather",null);
+  initChips("chips-windDir",WIND_DIR,"windDir",null);
+  initChips("chips-tide",TIDE,"tide",null);
+  initChips("chips-seat",SEATS,"seat",null);
+  initChips("chips-shikake",SHIKAKE,"shikake",null);
+  initChips("chips-hookType",HOOKS,"hookType",null);
 
-  const sqBtn=ge("page-add").querySelector("[data-search]");
-  if(sqBtn)sqBtn.addEventListener("click",doSearch);
-  const sqInp=ge("sq");
-  if(sqInp)sqInp.addEventListener("keydown",function(e){if(e.key==="Enter")doSearch();});
+  ge("sq-btn").addEventListener("click",doSearch);
+  ge("sq").addEventListener("keydown",e=>{if(e.key==="Enter")doSearch();});
+  ge("save-fd-btn").addEventListener("click",quickSaveFD);
+  ge("weather-btn").addEventListener("click",fetchWeather);
+  ge("add-fish-btn").addEventListener("click",addFishRow);
+  ge("savebtn").addEventListener("click",handleSave);
 
   renderFavFds();
   renderFishList();
 
-  // 既存の魚データを入力欄に反映
-  (r.fish||[]).forEach((f,i)=>{
+  // 編集時：既存魚データ反映（レンダリング後に少し待つ）
+  if(r&&r.fish){
     setTimeout(()=>{
-      if(ge("fish-length-"+i))ge("fish-length-"+i).value=f.length||"";
-      if(ge("fish-weight-"+i))ge("fish-weight-"+i).value=f.weight||"";
-    },50);
-  });
-
-  showPage("add");
+      (r.fish||[]).forEach((f,i)=>{
+        if(ge("fish-length-"+i))ge("fish-length-"+i).value=f.length||"";
+        if(ge("fish-weight-"+i))ge("fish-weight-"+i).value=f.weight||"";
+      });
+    },80);
+  }
 }
-
-// ===== 記録フォーム =====
-let sel={},fishSel=[],fishCounts=[];
-let fishCount=1;
 
 function showAdd(){
   editIdx=-1;
   sel={weather:"",windDir:"",tide:"",seat:"",shikake:"",hookType:""};
-  fishSel=[""];
-  fishCounts=[1];
-  fishCount=1;
-
+  fishSel=[""];fishCounts=[1];fishCount=1;
   ge("hbtn").innerHTML=`<button class="btn-ghost" onclick="showRec()">← 戻る</button>`;
-  const today=new Date().toISOString().split("T")[0];
-  const m=ge("page-add");
-
-  m.innerHTML=`
-    <h2 style="font-size:16px;color:#e8d48a;letter-spacing:2px;margin-bottom:18px">⚓ 新しい釣行を記録</h2>
-
-    <div class="card">
-      <div class="sec">📅 基本情報</div>
-      <div class="field"><label class="lbl">日付</label><input type="date" id="inp-date" value="${today}"></div>
-      <div class="field"><label class="lbl">釣りもの</label><input type="text" id="inp-target" placeholder="例：マダイ、LTアジ、タイラバ…"></div>
-      <div class="field"><label class="lbl">同行者</label><input type="text" id="inp-companion" placeholder="例：田中さん、釣り仲間3名…"></div>
-    </div>
-
-    <div class="card">
-      <div class="sec">🏠 船宿</div>
-      <div id="fav-fds"></div>
-      <div style="display:flex;gap:7px;margin-bottom:8px">
-        <input type="text" id="sq" placeholder="船宿を検索…" style="flex:1">
-        <button class="btn-ghost" data-search style="white-space:nowrap">検索</button>
-      </div>
-      <div id="sr" style="margin-bottom:8px"></div>
-      <div class="field"><label class="lbl">船宿名</label><input type="text" id="inp-fdName" placeholder="〇〇丸"></div>
-      <div class="g2">
-        <div class="field"><label class="lbl">港</label><input type="text" id="inp-port" placeholder="〇〇港"></div>
-        <div class="field"><label class="lbl">連絡先</label><input type="tel" id="inp-tel" placeholder="電話番号"></div>
-      </div>
-      <div class="field"><label class="lbl">出船時間</label><input type="time" id="inp-departure" placeholder="05:00"></div>
-      <button class="btn-ghost" style="font-size:12px;padding:7px 14px" onclick="quickSaveFD()">＋ 船宿リストに保存</button>
-    </div>
-
-    <div class="card">
-      <div class="sec">🌤️ 天候</div>
-      <div style="margin-bottom:12px">
-        <button class="btn-ghost btn-full" id="weather-btn" onclick="fetchWeather()">📍 現在地の天候を自動取得</button>
-        <div id="weather-status" style="font-size:11px;color:#6a9ab8;margin-top:6px;text-align:center"></div>
-      </div>
-      <div class="field"><label class="lbl">天気</label><div class="chips" id="chips-weather"></div></div>
-      <div class="g2">
-        <div class="field"><label class="lbl">風向</label><div class="chips" id="chips-windDir" style="gap:4px"></div></div>
-        <div class="field"><label class="lbl">風速 (m/s)</label><input type="number" id="inp-windSpeed" placeholder="5" step="0.5"></div>
-      </div>
-      <div class="g2">
-        <div class="field"><label class="lbl">気温(℃)</label><input type="number" id="inp-temp" placeholder="20"></div>
-        <div class="field"><label class="lbl">水温(℃)</label><input type="number" id="inp-waterTemp" placeholder="18"></div>
-      </div>
-      <div class="field"><label class="lbl">潮回り</label><div class="chips" id="chips-tide"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="sec">🚢 乗船位置</div>
-      <div class="field"><label class="lbl">座席</label><div class="chips" id="chips-seat"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="sec">🎣 タックル</div>
-      <div class="field"><label class="lbl">竿</label><input type="text" id="inp-rod" placeholder="例：シマノ 深海 200-300"></div>
-      <div class="field"><label class="lbl">リール</label><input type="text" id="inp-reel" placeholder="例：フォースマスター 600"></div>
-      <div class="field"><label class="lbl">道糸（号）</label><input type="number" id="inp-line" step="0.1" placeholder="3"></div>
-    </div>
-
-    <div class="card">
-      <div class="sec">🪝 仕掛け</div>
-      <div class="field"><label class="lbl">仕掛けの種類</label><div class="chips" id="chips-shikake"></div></div>
-      <div class="g2">
-        <div class="field"><label class="lbl">ハリス号数</label><input type="number" id="inp-harisGo" step="0.1" placeholder="2"></div>
-        <div class="field"><label class="lbl">ハリス長さ(m)</label><input type="number" id="inp-harisM" step="0.5" placeholder="1.5"></div>
-      </div>
-      <div class="field"><label class="lbl">針の種類</label><div class="chips" id="chips-hookType"></div></div>
-      <div class="g2">
-        <div class="field"><label class="lbl">針サイズ（号）</label><input type="number" id="inp-hookSize" placeholder="10"></div>
-        <div class="field"><label class="lbl">オモリ（号）</label><input type="number" id="inp-omori" placeholder="60"></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="sec">🐟 釣果（複数可）</div>
-      <div id="fish-list"></div>
-      <button class="btn-ghost btn-full" onclick="addFishRow()">＋ 魚を追加</button>
-    </div>
-
-    <div class="card">
-      <div class="sec">📝 メモ</div>
-      <textarea id="inp-memo" placeholder="ポイント、タナ、コマセ量、次回への備忘録など…"></textarea>
-    </div>
-
-    <button class="btn-gold btn-full" id="savebtn" onclick="handleSave()">航海記録を保存する</button>`;
-
-  // チップ初期化
-  initChips("chips-weather",WEATHER,"weather",sel,null);
-  initChips("chips-windDir",WIND_DIR,"windDir",sel,null);
-  initChips("chips-tide",TIDE,"tide",sel,null);
-  initChips("chips-seat",SEATS,"seat",sel,null);
-  initChips("chips-shikake",SHIKAKE,"shikake",sel,null);
-  initChips("chips-hookType",HOOKS,"hookType",sel,null);
-
-  // 検索ボタンをイベントリスナーで登録
-  const sqBtn=ge("page-add").querySelector("[data-search]");
-  if(sqBtn)sqBtn.addEventListener("click",doSearch);
-  const sqInp=ge("sq");
-  if(sqInp)sqInp.addEventListener("keydown",function(e){if(e.key==="Enter")doSearch();});
-
-  renderFavFds();
-  renderFishList();
+  initForm(null);
   showPage("add");
 }
 
+function showEdit(i){
+  editIdx=i;
+  const r=recs[i];
+  sel={
+    weather:r.weather||"",windDir:r.windDir||"",tide:r.tide||"",
+    seat:r.seat||"",shikake:r.shikake||"",hookType:r.hookType||""
+  };
+  fishSel=(r.fish||[]).map(f=>f.species||"");
+  fishCounts=(r.fish||[]).map(f=>Number(f.count)||1);
+  fishCount=Math.max(1,(r.fish||[]).length);
+  ge("hbtn").innerHTML=`<button class="btn-ghost" onclick="showDet(${i})">← 戻る</button>`;
+  initForm(r);
+  showPage("add");
+}
+
+// ===== 船宿 =====
 function renderFavFds(){
   const favs=fds.filter(f=>f.fav);
   const el=ge("fav-fds");if(!el)return;
   if(!favs.length){el.innerHTML="";return;}
   el.innerHTML=`<div style="font-size:10px;color:#c8a830;letter-spacing:2px;margin-bottom:6px">⭐ お気に入り</div>`+
-    favs.map(fd=>`<div onclick="pickFD('${fd.id}')" style="padding:8px 12px;background:rgba(180,150,60,0.06);border:1px solid rgba(180,150,60,0.2);border-radius:8px;margin-bottom:6px;cursor:pointer;display:flex;justify-content:space-between;-webkit-tap-highlight-color:transparent">
+    favs.map(fd=>`<div data-fdid="${fd.id}" style="padding:8px 12px;background:rgba(180,150,60,0.06);border:1px solid rgba(180,150,60,0.2);border-radius:8px;margin-bottom:6px;cursor:pointer;display:flex;justify-content:space-between;-webkit-tap-highlight-color:transparent">
       <span style="color:#e8d48a">${esc(fd.name)}</span><span style="color:#6a9ab8;font-size:12px">${esc(fd.port)}</span>
     </div>`).join("")+"<div style='margin-bottom:4px'></div>";
+  ge("fav-fds").querySelectorAll("[data-fdid]").forEach(el=>{
+    el.addEventListener("click",function(){pickFD(this.dataset.fdid);});
+  });
 }
 
 function pickFD(id){
@@ -499,21 +535,25 @@ function doSearch(){
   const q=(ge("sq").value||"").toLowerCase();
   if(!q){ge("sr").innerHTML="";return;}
   const res=fds.filter(f=>f.name.toLowerCase().includes(q)||f.port.toLowerCase().includes(q));
-  ge("sr").innerHTML=res.map(fd=>`<div onclick="pickFD('${fd.id}')" style="padding:8px 12px;background:rgba(180,150,60,0.08);border:1px solid rgba(180,150,60,0.2);border-radius:8px;margin-bottom:5px;cursor:pointer;display:flex;justify-content:space-between;font-size:13px;-webkit-tap-highlight-color:transparent">
+  const sr=ge("sr");
+  sr.innerHTML=res.map(fd=>`<div data-fdid="${fd.id}" style="padding:8px 12px;background:rgba(180,150,60,0.08);border:1px solid rgba(180,150,60,0.2);border-radius:8px;margin-bottom:5px;cursor:pointer;display:flex;justify-content:space-between;font-size:13px;-webkit-tap-highlight-color:transparent">
     <span style="color:#e8d48a">${esc(fd.name)}</span><span style="color:#6a9ab8">${esc(fd.port)}</span>
   </div>`).join("");
+  sr.querySelectorAll("[data-fdid]").forEach(el=>{
+    el.addEventListener("click",function(){pickFD(this.dataset.fdid);sr.innerHTML="";});
+  });
 }
 
 function quickSaveFD(){
   const name=(ge("inp-fdName").value||"").trim();
   if(!name){alert("船宿名を入力してください");return;}
-  if(fds.find(f=>f.name===name)){alert("この船宿名はすでに登録されています");return;}
-  const newFD={id:Date.now(),name:name,port:ge("inp-port").value||"",tel:ge("inp-tel").value||"",memo:"",fav:false};
-  fds=[newFD,...fds];
+  if(fds.find(f=>f.name===name)){toast("この船宿名はすでに登録されています");return;}
+  fds=[{id:Date.now(),name,port:ge("inp-port").value||"",tel:ge("inp-tel").value||"",memo:"",fav:false},...fds];
   saveFds();
-  alert("「"+name+"」を船宿リストに保存しました！\n🏠 船宿タブで確認できます。");
+  toast("「"+name+"」を船宿リストに保存しました！");
 }
 
+// ===== 魚リスト =====
 function renderFishList(){
   const el=ge("fish-list");if(!el)return;
   el.innerHTML="";
@@ -545,122 +585,25 @@ function renderFishList(){
         </div>
       </div>`;
     el.appendChild(div);
-
-    // 魚種チップ
-    initFishChips("chips-fish-"+i, allFish, i, fishSel);
-
-    // ステッパー
-    div.querySelector("[data-minus='"+i+"']").addEventListener("click",function(){
-      if(fishCounts[i]>1){fishCounts[i]--;ge("fish-cnt-"+i).textContent=fishCounts[i];}
-    });
-    div.querySelector("[data-plus='"+i+"']").addEventListener("click",function(){
-      fishCounts[i]++;ge("fish-cnt-"+i).textContent=fishCounts[i];
-    });
-
-    // 新魚種追加
-    div.querySelector("[data-addfish='"+i+"']").addEventListener("click",function(){
+    initFishChips("chips-fish-"+i,allFish,i);
+    div.querySelector("[data-minus='"+i+"']").addEventListener("click",()=>{if(fishCounts[i]>1){fishCounts[i]--;ge("fish-cnt-"+i).textContent=fishCounts[i];}});
+    div.querySelector("[data-plus='"+i+"']").addEventListener("click",()=>{fishCounts[i]++;ge("fish-cnt-"+i).textContent=fishCounts[i];});
+    div.querySelector("[data-addfish='"+i+"']").addEventListener("click",()=>{
       const inp=ge("fish-newinp-"+i);
-      const name=(inp.value||"").trim();
-      if(!name)return;
-      addToFishDB(name);
-      fishSel[i]=name;
-      inp.value="";
-      // チップを再描画
-      initFishChips("chips-fish-"+i, getFishList(), i, fishSel);
+      const name=(inp.value||"").trim();if(!name)return;
+      addToFishDB(name);fishSel[i]=name;inp.value="";
+      initFishChips("chips-fish-"+i,getFishList(),i);
     });
-
-    // 削除ボタン
-    const removeBtn=div.querySelector("[data-remove='"+i+"']");
-    if(removeBtn){
-      removeBtn.addEventListener("click",function(){
-        fishSel.splice(i,1);
-        fishCounts.splice(i,1);
-        fishCount--;
-        renderFishList();
-      });
-    }
+    const rb=div.querySelector("[data-remove='"+i+"']");
+    if(rb)rb.addEventListener("click",()=>{fishSel.splice(i,1);fishCounts.splice(i,1);fishCount--;renderFishList();});
   }
 }
 
 function addFishRow(){
-  fishSel.push("");
-  fishCounts.push(1);
-  fishCount++;
-  renderFishList();
+  fishSel.push("");fishCounts.push(1);fishCount++;renderFishList();
 }
 
-// 風向を度数からテキストに変換
-function degToDir(deg){
-  const dirs=["北","北東","東","南東","南","南西","西","北西"];
-  return dirs[Math.round(deg/45)%8];
-}
-
-// 天候コードを日本語に変換
-function wmoToJa(code){
-  if(code<=1)return "☀️ 晴れ";
-  if(code<=3)return "⛅ 曇り";
-  return "🌧️ 雨";
-}
-
-// 天候自動取得
-async function fetchWeather(){
-  const btn=ge("weather-btn");
-  const status=ge("weather-status");
-  if(btn){btn.textContent="📡 取得中…";btn.disabled=true;}
-  if(status)status.textContent="位置情報を取得しています…";
-
-  if(!navigator.geolocation){
-    if(status)status.textContent="⚠️ この端末はGPSに対応していません";
-    if(btn){btn.textContent="📍 現在地の天候を自動取得";btn.disabled=false;}
-    return;
-  }
-
-  navigator.geolocation.getCurrentPosition(async function(pos){
-    const lat=pos.coords.latitude.toFixed(4);
-    const lon=pos.coords.longitude.toFixed(4);
-    if(status)status.textContent="天候データを取得しています…";
-    try{
-      const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,wind_speed_10m,wind_direction_10m&hourly=sea_surface_temperature&forecast_days=1&timezone=Asia%2FTokyo`;
-      const res=await fetch(url);
-      const data=await res.json();
-      const cur=data.current;
-
-      // 天気チップ選択
-      const weatherLabel=wmoToJa(cur.weather_code);
-      sel.weather=weatherLabel;
-      ge("chips-weather").querySelectorAll(".chip").forEach(c=>{
-        c.classList.toggle("on",c.textContent===weatherLabel);
-      });
-
-      // 風向チップ選択
-      const windDirLabel=degToDir(cur.wind_direction_10m);
-      sel.windDir=windDirLabel;
-      ge("chips-windDir").querySelectorAll(".chip").forEach(c=>{
-        c.classList.toggle("on",c.textContent===windDirLabel);
-      });
-
-      // 風速・気温
-      if(ge("inp-windSpeed"))ge("inp-windSpeed").value=Math.round(cur.wind_speed_10m*10/36)/10; // km/h→m/s
-      if(ge("inp-temp"))ge("inp-temp").value=Math.round(cur.temperature_2m*10)/10;
-
-      // 水温（海面水温）
-      const sst=data.hourly?.sea_surface_temperature;
-      if(sst&&sst.length>0){
-        const validSst=sst.find(v=>v!=null);
-        if(validSst&&ge("inp-waterTemp"))ge("inp-waterTemp").value=Math.round(validSst*10)/10;
-      }
-
-      if(status)status.textContent=`✅ 取得完了！（${lat}, ${lon}）`;
-    }catch(e){
-      if(status)status.textContent="⚠️ 天候データの取得に失敗しました";
-    }
-    if(btn){btn.textContent="🔄 再取得";btn.disabled=false;}
-  },function(err){
-    if(status)status.textContent="⚠️ 位置情報の取得を許可してください";
-    if(btn){btn.textContent="📍 現在地の天候を自動取得";btn.disabled=false;}
-  },{timeout:10000});
-}
-
+// ===== 保存 =====
 async function handleSave(){
   const btn=ge("savebtn");
   if(btn){btn.textContent="保存中…";btn.disabled=true;}
@@ -669,17 +612,12 @@ async function handleSave(){
   for(let i=0;i<fishCount;i++){
     const species=fishSel[i]||"";
     if(species){
-      fish.push({
-        species:species,
-        length:ge("fish-length-"+i)?ge("fish-length-"+i).value:"",
-        weight:ge("fish-weight-"+i)?ge("fish-weight-"+i).value:"",
-        count:fishCounts[i]||1
-      });
+      fish.push({species,length:ge("fish-length-"+i)?ge("fish-length-"+i).value:"",weight:ge("fish-weight-"+i)?ge("fish-weight-"+i).value:"",count:fishCounts[i]||1});
     }
   }
 
   const rec={
-    id:Date.now(),
+    id:editIdx>=0?recs[editIdx].id:Date.now(),
     date:ge("inp-date").value,
     target:ge("inp-target").value,
     companion:ge("inp-companion").value,
@@ -707,35 +645,66 @@ async function handleSave(){
     fish:fish
   };
 
+  const payload={
+    id:rec.id,日付:rec.date,釣りもの:rec.target,同行者:rec.companion,
+    船宿:rec.fdName,港:rec.port,連絡先:rec.tel,出船時間:rec.departure,
+    座席:rec.seat,天気:rec.weather,風向:rec.windDir,風速:rec.windSpeed,
+    潮回り:rec.tide,気温:rec.temp,水温:rec.waterTemp,
+    竿:rec.rod,リール:rec.reel,道糸号数:rec.line,
+    仕掛け:rec.shikake,ハリス号数:rec.harisGo,ハリス長さm:rec.harisM,
+    針種類:rec.hookType,針サイズ号:rec.hookSize,オモリ号:rec.omori,
+    釣果:fishToStr(fish),メモ:rec.memo
+  };
+
   if(editIdx>=0){
-    // 編集モード：既存レコードを上書き
-    recs[editIdx]={...recs[editIdx],...rec,id:recs[editIdx].id};
-    saveRecs();
+    payload._action="update";payload._id=rec.id;
+    await gasPost(payload);
+    recs[editIdx]=rec;
     if(btn)btn.textContent="✅ 更新しました！";
     setTimeout(()=>showDet(editIdx),900);
   } else {
-    // 新規モード
+    await gasPost(payload);
     recs=[rec,...recs];
-    saveRecs();
-    await sendSheet(rec);
+    updateSubtitle();
     if(btn)btn.textContent="✅ 保存しました！";
     setTimeout(()=>showRec(),900);
   }
 }
 
-async function sendSheet(rec){
-  if(!gasUrl)return;
-  try{
-    const fs=rec.fish.map(f=>`${f.species}${f.length?" "+f.length+"cm":""}${f.weight?" "+f.weight+"g":""} ×${f.count}匹`).join(" / ");
-    await fetch(gasUrl,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({日付:rec.date,釣りもの:rec.target,同行者:rec.companion,船宿:rec.fdName,港:rec.port,連絡先:rec.tel,出船時間:rec.departure,座席:rec.seat,天気:rec.weather,風向:rec.windDir,風速:rec.windSpeed,潮回り:rec.tide,気温:rec.temp,水温:rec.waterTemp,竿:rec.rod,リール:rec.reel,道糸号数:rec.line,仕掛け:rec.shikake,ハリス号数:rec.harisGo,ハリス長さm:rec.harisM,針種類:rec.hookType,針サイズ号:rec.hookSize,オモリ号:rec.omori,釣果:fs,メモ:rec.memo})
-    });
-  }catch(e){console.log("GAS error",e);}
+// ===== 天候自動取得 =====
+function degToDir(deg){const dirs=["北","北東","東","南東","南","南西","西","北西"];return dirs[Math.round(deg/45)%8];}
+function wmoToJa(code){if(code<=1)return"☀️ 晴れ";if(code<=3)return"⛅ 曇り";return"🌧️ 雨";}
+
+async function fetchWeather(){
+  const btn=ge("weather-btn"),status=ge("weather-status");
+  if(btn){btn.textContent="📡 取得中…";btn.disabled=true;}
+  if(status)status.textContent="位置情報を取得中…";
+  if(!navigator.geolocation){if(status)status.textContent="⚠️ GPS非対応";if(btn){btn.textContent="📍 現在地の天候を自動取得";btn.disabled=false;}return;}
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    const lat=pos.coords.latitude.toFixed(4),lon=pos.coords.longitude.toFixed(4);
+    if(status)status.textContent="天候データ取得中…";
+    try{
+      const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,wind_speed_10m,wind_direction_10m&hourly=sea_surface_temperature&forecast_days=1&timezone=Asia%2FTokyo`;
+      const data=await(await fetch(url)).json();
+      const cur=data.current;
+      const wl=wmoToJa(cur.weather_code);
+      sel.weather=wl;
+      ge("chips-weather").querySelectorAll(".chip").forEach(c=>c.classList.toggle("on",c.textContent===wl));
+      const wdl=degToDir(cur.wind_direction_10m);
+      sel.windDir=wdl;
+      ge("chips-windDir").querySelectorAll(".chip").forEach(c=>c.classList.toggle("on",c.textContent===wdl));
+      if(ge("inp-windSpeed"))ge("inp-windSpeed").value=Math.round(cur.wind_speed_10m*10/36)/10;
+      if(ge("inp-temp"))ge("inp-temp").value=Math.round(cur.temperature_2m*10)/10;
+      const sst=data.hourly?.sea_surface_temperature;
+      if(sst){const v=sst.find(x=>x!=null);if(v&&ge("inp-waterTemp"))ge("inp-waterTemp").value=Math.round(v*10)/10;}
+      if(status)status.textContent=`✅ 取得完了！`;
+    }catch{if(status)status.textContent="⚠️ 取得に失敗しました";}
+    if(btn){btn.textContent="🔄 再取得";btn.disabled=false;}
+  },()=>{if(status)status.textContent="⚠️ 位置情報を許可してください";if(btn){btn.textContent="📍 現在地の天候を自動取得";btn.disabled=false;}},{timeout:10000});
 }
 
-// ===== 船宿 =====
+// ===== 船宿タブ =====
 function showFd(){
-  updateSubtitle();
   ge("hbtn").innerHTML=`<button class="btn-gold" onclick="showFdForm(null)">＋ 追加</button>`;
   const sorted=[...fds].sort((a,b)=>b.fav-a.fav);
   const m=ge("page-fd");
@@ -748,38 +717,33 @@ function showFd(){
           <div style="flex:1">
             <div style="display:flex;align-items:center;gap:8px">
               <span style="font-size:15px;font-weight:700;color:#e8d48a">${esc(fd.name)}</span>
-              <span style="font-size:16px;cursor:pointer;opacity:${fd.fav?1:0.3};-webkit-tap-highlight-color:transparent" onclick="togFav('${fd.id}')">⭐</span>
+              <span style="font-size:16px;cursor:pointer;opacity:${fd.fav?1:0.3}" data-favid="${fd.id}">⭐</span>
             </div>
             <div style="font-size:12px;color:#7aacb8;margin-top:2px">📍 ${esc(fd.port)}</div>
             ${fd.tel?`<div style="font-size:12px;color:#7aacb8">📞 ${esc(fd.tel)}</div>`:""}
             ${fd.memo?`<div style="font-size:11px;color:#5a7a88;margin-top:3px">${esc(fd.memo)}</div>`:""}
           </div>
           <div style="display:flex;gap:5px;flex-shrink:0;margin-left:8px">
-            <button class="btn-ghost" style="padding:5px 11px;font-size:12px" onclick="showFdForm('${fd.id}')">編集</button>
-            <button class="btn-danger" style="padding:5px 11px;font-size:12px" onclick="deleteFD('${fd.id}')">削除</button>
+            <button class="btn-ghost" style="padding:5px 11px;font-size:12px" data-editfd="${fd.id}">編集</button>
+            <button class="btn-danger" style="padding:5px 11px;font-size:12px" data-delfd="${fd.id}">削除</button>
           </div>
         </div>
       </div>`).join("");
+    m.querySelectorAll("[data-favid]").forEach(el=>el.addEventListener("click",()=>togFav(el.dataset.favid)));
+    m.querySelectorAll("[data-editfd]").forEach(el=>el.addEventListener("click",()=>showFdForm(el.dataset.editfd)));
+    m.querySelectorAll("[data-delfd]").forEach(el=>el.addEventListener("click",()=>deleteFD(el.dataset.delfd)));
   }
   showPage("fd");
 }
 
-function togFav(id){
-  const i=fds.findIndex(f=>String(f.id)===String(id));
-  if(i>=0){fds[i].fav=!fds[i].fav;saveFds();showFd();}
-}
-
-function deleteFD(id){
-  if(!confirm("削除しますか？"))return;
-  fds=fds.filter(f=>String(f.id)!==String(id));saveFds();showFd();
-}
+function togFav(id){const i=fds.findIndex(f=>String(f.id)===String(id));if(i>=0){fds[i].fav=!fds[i].fav;saveFds();showFd();}}
+function deleteFD(id){if(!confirm("削除しますか？"))return;fds=fds.filter(f=>String(f.id)!==String(id));saveFds();showFd();}
 
 function showFdForm(id){
   const existing=id?fds.find(f=>String(f.id)===String(id)):null;
   ge("hbtn").innerHTML=`<button class="btn-ghost" onclick="showFd()">← 戻る</button>`;
   const fd=existing||{name:"",port:"",tel:"",memo:"",fav:false};
   let favState=fd.fav||false;
-
   ge("page-fdform").innerHTML=`
     <h2 style="font-size:15px;color:#e8d48a;margin:0 0 18px">${existing?"船宿を編集":"船宿を登録"}</h2>
     <div class="card">
@@ -787,84 +751,64 @@ function showFdForm(id){
       <div class="field"><label class="lbl">港</label><input type="text" id="fd-port" placeholder="〇〇港" value="${esc(fd.port)}"></div>
       <div class="field"><label class="lbl">電話番号</label><input type="tel" id="fd-tel" placeholder="0467-XX-XXXX" value="${esc(fd.tel)}"></div>
       <div class="field"><label class="lbl">メモ</label><input type="text" id="fd-memo" placeholder="集合時間、駐車場など" value="${esc(fd.memo)}"></div>
-      <div style="display:flex;align-items:center;gap:10px;margin-top:8px;cursor:pointer;-webkit-tap-highlight-color:transparent" id="fav-toggle">
+      <div style="display:flex;align-items:center;gap:10px;margin-top:8px;cursor:pointer" id="fav-toggle">
         <span id="fav-icon" style="font-size:18px;opacity:${favState?1:0.3}">⭐</span>
         <span id="fav-txt" style="font-size:13px;color:${favState?"#e8d48a":"#5a8aaa"}">お気に入りに登録する</span>
       </div>
     </div>
     <button class="btn-gold btn-full" id="fd-save-btn">保存する</button>`;
-
-  ge("fav-toggle").addEventListener("click",function(){
-    favState=!favState;
-    ge("fav-icon").style.opacity=favState?1:0.3;
-    ge("fav-txt").style.color=favState?"#e8d48a":"#5a8aaa";
-  });
-
-  ge("fd-save-btn").addEventListener("click",function(){
+  ge("fav-toggle").addEventListener("click",()=>{favState=!favState;ge("fav-icon").style.opacity=favState?1:0.3;ge("fav-txt").style.color=favState?"#e8d48a":"#5a8aaa";});
+  ge("fd-save-btn").addEventListener("click",()=>{
     const name=(ge("fd-name").value||"").trim();
     if(!name){alert("船宿名を入力してください");return;}
     const data={name,port:ge("fd-port").value||"",tel:ge("fd-tel").value||"",memo:ge("fd-memo").value||"",fav:favState};
-    if(existing){
-      fds=fds.map(f=>String(f.id)===String(existing.id)?{...f,...data}:f);
-    } else {
-      fds=[{id:Date.now(),...data},...fds];
-    }
-    saveFds();
-    showFd();
+    if(existing){fds=fds.map(f=>String(f.id)===String(existing.id)?{...f,...data}:f);}
+    else{fds=[{id:Date.now(),...data},...fds];}
+    saveFds();showFd();
   });
-
   showPage("fdform");
 }
 
-// ===== 設定 =====
+// ===== 設定タブ =====
 function showSet(){
   ge("hbtn").innerHTML="";
   ge("page-set").innerHTML=`
     <h2 style="font-size:16px;color:#e8d48a;letter-spacing:2px;margin-bottom:18px">⚙️ Google スプレッドシート連携</h2>
     <div class="card">
-      <div style="font-size:13px;color:#7aacb8;line-height:1.9;margin-bottom:14px">釣行を保存するたびに自動でGoogleスプレッドシートに記録されます。設定は一度だけです。</div>
-      <div class="steps">
-        <div style="color:#c8a830;font-weight:700;margin-bottom:4px">📋 設定手順</div>
-        <div><span style="color:#e8d48a">① </span>Googleスプレッドシートを新規作成</div>
-        <div><span style="color:#e8d48a">② </span>「拡張機能」→「Apps Script」を開く</div>
-        <div><span style="color:#e8d48a">③ </span>既存コードを全消し → 下のコードを貼り付けて保存💾</div>
-        <div><span style="color:#e8d48a">④ </span>「デプロイ」→「新しいデプロイ」→「ウェブアプリ」</div>
-        <div><span style="color:#e8d48a">⑤ </span>アクセス権「全員」→「デプロイ」→ 警告は「詳細」→「移動」→「許可」</div>
-        <div><span style="color:#e8d48a">⑥ </span>表示されたURLを下に貼り付けて「保存」</div>
+      <div style="font-size:13px;color:#7aacb8;line-height:1.9;margin-bottom:14px">
+        スプレッドシートがデータの保存場所です。PCでもスマホでも同じデータが見られます。
       </div>
-      <div style="font-size:10px;color:#c8a830;letter-spacing:2px;margin-bottom:7px">APPS SCRIPT コード</div>
-      <div class="code-box">${GAS_CODE.replace(/\\n/g,"\n")}</div>
+      <div class="steps">
+        <div style="color:#c8a830;font-weight:700;margin-bottom:4px">📋 Apps Script コード（更新版）</div>
+        <div><span style="color:#e8d48a">① </span>Apps Scriptを開いてコードを下記に置き換えて保存💾</div>
+        <div><span style="color:#e8d48a">② </span>「デプロイを管理」→ ✏️ → 「新しいバージョン」→「デプロイ」</div>
+        <div><span style="color:#e8d48a">③ </span>URLは変わらないのでそのままOK</div>
+      </div>
+      <div class="code-box" id="gas-code-box">${GAS_CODE.replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>
       <button class="btn-ghost btn-full" id="copybtn" style="margin-bottom:16px">📋 コードをコピー</button>
-      <div class="field"><label class="lbl">デプロイURL（手順⑥で取得）</label>
+      <div class="field"><label class="lbl">デプロイURL</label>
         <div style="display:flex;gap:7px">
           <input type="text" id="gas-inp" placeholder="https://script.google.com/macros/s/..." value="${esc(gasUrl)}" style="flex:1;font-size:12px">
           <button class="btn-gold" id="gas-save-btn" style="padding:9px 14px;white-space:nowrap">保存</button>
         </div>
       </div>
-      <div id="gas-st" style="font-size:12px;margin-top:4px;color:${gasUrl?"#4ab870":"#5a8aaa"}">${gasUrl?"✅ 連携済み — 次の釣行から自動送信されます":"URLを設定するとスプレッドシートに自動保存されます"}</div>
+      <div id="gas-st" style="font-size:12px;margin-top:4px;color:${gasUrl?"#4ab870":"#5a8aaa"}">${gasUrl?"✅ 連携済み":"URLを設定してください"}</div>
     </div>`;
-
-  ge("copybtn").addEventListener("click",function(){
-    const code=GAS_CODE.replace(/\\n/g,"\n");
-    navigator.clipboard.writeText(code).then(()=>{
-      ge("copybtn").textContent="✅ コピーしました！";
-      setTimeout(()=>ge("copybtn").textContent="📋 コードをコピー",2000);
-    }).catch(()=>alert("手動でコードをコピーしてください"));
+  ge("copybtn").addEventListener("click",()=>{
+    navigator.clipboard.writeText(GAS_CODE).then(()=>{ge("copybtn").textContent="✅ コピーしました！";setTimeout(()=>ge("copybtn").textContent="📋 コードをコピー",2000);}).catch(()=>alert("手動でコピーしてください"));
   });
-
-  ge("gas-save-btn").addEventListener("click",function(){
+  ge("gas-save-btn").addEventListener("click",()=>{
     gasUrl=(ge("gas-inp").value||"").trim();
     try{localStorage.setItem(SK_G,gasUrl);}catch{}
-    ge("gas-st").textContent="✅ 連携済み — 次の釣行から自動送信されます";
+    ge("gas-st").textContent="✅ 連携済み — データを読み込みます…";
     ge("gas-st").style.color="#4ab870";
+    if(gasUrl)setTimeout(()=>{switchTab("rec");loadFromSheet();},500);
   });
-
   showPage("set");
 }
 
 // ===== 起動 =====
-load();
-showRec();
+init();
 </script>
 </body>
 </html>
