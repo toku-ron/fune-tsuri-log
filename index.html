@@ -95,48 +95,42 @@ const GAS_CODE=`function doPost(e) {
   const data = JSON.parse(e.postData.contents);
   const action = data._action;
 
-  if (action === "delete") {
-    const rows = sheet.getDataRange().getValues();
-    const headers = rows[0];
-    const idCol = headers.indexOf("id");
-    for (let i = rows.length - 1; i >= 1; i--) {
-      const rowId = idCol >= 0 ? String(rows[i][idCol]) : String(rows[i][0]);
-      if (rowId === String(data._id)) {
-        sheet.deleteRow(i + 1); break;
-      }
-    }
-    return ContentService.createTextOutput("ok").setMimeType(ContentService.MimeType.TEXT);
-  }
-
-  if (action === "update") {
-    const rows = sheet.getDataRange().getValues();
-    const headers = rows[0];
+  // 行を特定するヘルパー
+  function findRow(rows, headers, id, date, fdName) {
     const idCol = headers.indexOf("id");
     const dateCol = headers.indexOf("日付");
     const fdCol = headers.indexOf("船宿");
-    let targetRow = -1;
-    // まずidで検索
-    if (idCol >= 0) {
-      for (let i = 1; i < rows.length; i++) {
-        if (String(rows[i][idCol]) === String(data._id)) { targetRow = i; break; }
-      }
+    for (let i = 1; i < rows.length; i++) {
+      if (idCol >= 0 && id && String(rows[i][idCol]) === String(id)) return i;
     }
     // idで見つからなければ日付+船宿名で検索
-    if (targetRow < 0 && dateCol >= 0 && fdCol >= 0) {
-      for (let i = 1; i < rows.length; i++) {
-        if (String(rows[i][dateCol]) === String(data._date) &&
-            String(rows[i][fdCol]) === String(data._fdName)) {
-          targetRow = i; break;
-        }
-      }
+    for (let i = 1; i < rows.length; i++) {
+      const rowDate = dateCol >= 0 ? String(rows[i][dateCol]).substring(0,10) : "";
+      const rowFd = fdCol >= 0 ? String(rows[i][fdCol]) : "";
+      if (date && rowDate === String(date).substring(0,10) && rowFd === String(fdName)) return i;
     }
-    if (targetRow >= 0) {
-      headers.forEach((h, j) => {
-        if (h && !h.startsWith("_") && data[h] !== undefined) {
-          sheet.getRange(targetRow + 1, j + 1).setValue(data[h]);
-        }
-      });
-    }
+    return -1;
+  }
+
+  if (action === "delete") {
+    const rows = sheet.getDataRange().getValues();
+    const headers = rows[0];
+    const idx = findRow(rows, headers, data._id, data._date, data._fdName);
+    if (idx >= 0) sheet.deleteRow(idx + 1);
+    return ContentService.createTextOutput("ok").setMimeType(ContentService.MimeType.TEXT);
+  }
+
+  if (action === "replace") {
+    const rows = sheet.getDataRange().getValues();
+    const headers = rows[0];
+    // 旧行を削除
+    const idx = findRow(rows, headers, data._oldId, data._oldDate, data._oldFdName);
+    if (idx >= 0) sheet.deleteRow(idx + 1);
+    // 新行を追加
+    const keys = Object.keys(data).filter(k => !k.startsWith("_"));
+    const vals = keys.map(k => data[k]);
+    if (sheet.getLastRow() === 0) sheet.appendRow(keys);
+    sheet.appendRow(vals);
     return ContentService.createTextOutput("ok").setMimeType(ContentService.MimeType.TEXT);
   }
 
@@ -732,11 +726,12 @@ async function handleSave(){
   };
 
   if(editIdx>=0){
-    payload._action="update";
-    payload._id=rec.id;
-    // スプレッドシート上で日付+船宿名でも特定できるよう追加
-    payload._date=rec.date;
-    payload._fdName=rec.fdName;
+    // 削除→再追加方式（id列がなくても確実に動く）
+    const oldRec=recs[editIdx];
+    payload._action="replace";
+    payload._oldDate=String(oldRec.date||"");
+    payload._oldFdName=String(oldRec.fdName||"");
+    payload._oldId=String(oldRec.id||"");
     await gasPost(payload);
     recs[editIdx]=rec;
     if(btn)btn.textContent="✅ 更新しました！";
