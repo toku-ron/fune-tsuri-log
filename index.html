@@ -192,6 +192,7 @@ function showDet(i){
       ${r.target?`<div style="font-size:13px;color:#c8a830;margin-top:2px">🎯 ${esc(r.target)}</div>`:""}
       <div style="font-size:12px;color:#6a9ab8;margin-top:4px">${esc(r.port)}${r.seat?"　"+esc(r.seat):""}</div>
       ${r.tel?`<div style="font-size:12px;color:#5a8aaa;margin-top:2px">📞 ${esc(r.tel)}</div>`:""}
+      ${r.departure?`<div style="font-size:12px;color:#7aacb8;margin-top:2px">⛵ 出船 ${esc(r.departure)}</div>`:""}
       ${r.companion?`<div style="font-size:12px;color:#7aacb8;margin-top:2px">👥 ${esc(r.companion)}</div>`:""}
     </div>
     <div class="card"><div class="sec">🐟 釣果</div>
@@ -242,17 +243,6 @@ function showAdd(){
       <div class="field"><label class="lbl">日付</label><input type="date" id="inp-date" value="${today}"></div>
       <div class="field"><label class="lbl">釣りもの</label><input type="text" id="inp-target" placeholder="例：マダイ、LTアジ、タイラバ…"></div>
       <div class="field"><label class="lbl">同行者</label><input type="text" id="inp-companion" placeholder="例：田中さん、釣り仲間3名…"></div>
-      <div class="field"><label class="lbl">天気</label><div class="chips" id="chips-weather"></div></div>
-      <div class="g2">
-        <div class="field"><label class="lbl">風向</label><div class="chips" id="chips-windDir" style="gap:4px"></div></div>
-        <div class="field"><label class="lbl">風速 (m/s)</label><input type="number" id="inp-windSpeed" placeholder="5" step="0.5"></div>
-      </div>
-      <div class="g2">
-        <div class="field"><label class="lbl">気温(℃)</label><input type="number" id="inp-temp" placeholder="20"></div>
-        <div class="field"><label class="lbl">水温(℃)</label><input type="number" id="inp-waterTemp" placeholder="18"></div>
-      </div>
-      <div class="field"><label class="lbl">潮回り</label><div class="chips" id="chips-tide"></div></div>
-      <div class="field"><label class="lbl">メモ・釣りもの</label><textarea id="inp-memo" placeholder="釣りもの、ポイント、タナ、コマセ量など…"></textarea></div>
     </div>
 
     <div class="card">
@@ -268,7 +258,26 @@ function showAdd(){
         <div class="field"><label class="lbl">港</label><input type="text" id="inp-port" placeholder="〇〇港"></div>
         <div class="field"><label class="lbl">連絡先</label><input type="tel" id="inp-tel" placeholder="電話番号"></div>
       </div>
+      <div class="field"><label class="lbl">出船時間</label><input type="time" id="inp-departure" placeholder="05:00"></div>
       <button class="btn-ghost" style="font-size:12px;padding:7px 14px" onclick="quickSaveFD()">＋ 船宿リストに保存</button>
+    </div>
+
+    <div class="card">
+      <div class="sec">🌤️ 天候</div>
+      <div style="margin-bottom:12px">
+        <button class="btn-ghost btn-full" id="weather-btn" onclick="fetchWeather()">📍 現在地の天候を自動取得</button>
+        <div id="weather-status" style="font-size:11px;color:#6a9ab8;margin-top:6px;text-align:center"></div>
+      </div>
+      <div class="field"><label class="lbl">天気</label><div class="chips" id="chips-weather"></div></div>
+      <div class="g2">
+        <div class="field"><label class="lbl">風向</label><div class="chips" id="chips-windDir" style="gap:4px"></div></div>
+        <div class="field"><label class="lbl">風速 (m/s)</label><input type="number" id="inp-windSpeed" placeholder="5" step="0.5"></div>
+      </div>
+      <div class="g2">
+        <div class="field"><label class="lbl">気温(℃)</label><input type="number" id="inp-temp" placeholder="20"></div>
+        <div class="field"><label class="lbl">水温(℃)</label><input type="number" id="inp-waterTemp" placeholder="18"></div>
+      </div>
+      <div class="field"><label class="lbl">潮回り</label><div class="chips" id="chips-tide"></div></div>
     </div>
 
     <div class="card">
@@ -301,6 +310,11 @@ function showAdd(){
       <div class="sec">🐟 釣果（複数可）</div>
       <div id="fish-list"></div>
       <button class="btn-ghost btn-full" onclick="addFishRow()">＋ 魚を追加</button>
+    </div>
+
+    <div class="card">
+      <div class="sec">📝 メモ</div>
+      <textarea id="inp-memo" placeholder="ポイント、タナ、コマセ量、次回への備忘録など…"></textarea>
     </div>
 
     <button class="btn-gold btn-full" id="savebtn" onclick="handleSave()">航海記録を保存する</button>`;
@@ -429,6 +443,78 @@ function addFishRow(){
   renderFishList();
 }
 
+// 風向を度数からテキストに変換
+function degToDir(deg){
+  const dirs=["北","北東","東","南東","南","南西","西","北西"];
+  return dirs[Math.round(deg/45)%8];
+}
+
+// 天候コードを日本語に変換
+function wmoToJa(code){
+  if(code<=1)return "☀️ 晴れ";
+  if(code<=3)return "⛅ 曇り";
+  return "🌧️ 雨";
+}
+
+// 天候自動取得
+async function fetchWeather(){
+  const btn=ge("weather-btn");
+  const status=ge("weather-status");
+  if(btn){btn.textContent="📡 取得中…";btn.disabled=true;}
+  if(status)status.textContent="位置情報を取得しています…";
+
+  if(!navigator.geolocation){
+    if(status)status.textContent="⚠️ この端末はGPSに対応していません";
+    if(btn){btn.textContent="📍 現在地の天候を自動取得";btn.disabled=false;}
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(async function(pos){
+    const lat=pos.coords.latitude.toFixed(4);
+    const lon=pos.coords.longitude.toFixed(4);
+    if(status)status.textContent="天候データを取得しています…";
+    try{
+      const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,wind_speed_10m,wind_direction_10m&hourly=sea_surface_temperature&forecast_days=1&timezone=Asia%2FTokyo`;
+      const res=await fetch(url);
+      const data=await res.json();
+      const cur=data.current;
+
+      // 天気チップ選択
+      const weatherLabel=wmoToJa(cur.weather_code);
+      sel.weather=weatherLabel;
+      ge("chips-weather").querySelectorAll(".chip").forEach(c=>{
+        c.classList.toggle("on",c.textContent===weatherLabel);
+      });
+
+      // 風向チップ選択
+      const windDirLabel=degToDir(cur.wind_direction_10m);
+      sel.windDir=windDirLabel;
+      ge("chips-windDir").querySelectorAll(".chip").forEach(c=>{
+        c.classList.toggle("on",c.textContent===windDirLabel);
+      });
+
+      // 風速・気温
+      if(ge("inp-windSpeed"))ge("inp-windSpeed").value=Math.round(cur.wind_speed_10m*10/36)/10; // km/h→m/s
+      if(ge("inp-temp"))ge("inp-temp").value=Math.round(cur.temperature_2m*10)/10;
+
+      // 水温（海面水温）
+      const sst=data.hourly?.sea_surface_temperature;
+      if(sst&&sst.length>0){
+        const validSst=sst.find(v=>v!=null);
+        if(validSst&&ge("inp-waterTemp"))ge("inp-waterTemp").value=Math.round(validSst*10)/10;
+      }
+
+      if(status)status.textContent=`✅ 取得完了！（${lat}, ${lon}）`;
+    }catch(e){
+      if(status)status.textContent="⚠️ 天候データの取得に失敗しました";
+    }
+    if(btn){btn.textContent="🔄 再取得";btn.disabled=false;}
+  },function(err){
+    if(status)status.textContent="⚠️ 位置情報の取得を許可してください";
+    if(btn){btn.textContent="📍 現在地の天候を自動取得";btn.disabled=false;}
+  },{timeout:10000});
+}
+
 async function handleSave(){
   const btn=ge("savebtn");
   if(btn){btn.textContent="保存中…";btn.disabled=true;}
@@ -454,6 +540,7 @@ async function handleSave(){
     fdName:ge("inp-fdName").value,
     port:ge("inp-port").value,
     tel:ge("inp-tel").value,
+    departure:ge("inp-departure").value,
     weather:sel.weather,
     windDir:sel.windDir,
     windSpeed:ge("inp-windSpeed").value,
@@ -470,7 +557,7 @@ async function handleSave(){
     hookType:sel.hookType,
     hookSize:ge("inp-hookSize").value,
     omori:ge("inp-omori").value,
-    memo:ge("inp-memo").value,
+    memo:ge("inp-memo")?ge("inp-memo").value:"",
     fish:fish
   };
 
@@ -487,7 +574,7 @@ async function sendSheet(rec){
   try{
     const fs=rec.fish.map(f=>`${f.species}${f.length?" "+f.length+"cm":""}${f.weight?" "+f.weight+"g":""} ×${f.count}匹`).join(" / ");
     await fetch(gasUrl,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({日付:rec.date,釣りもの:rec.target,同行者:rec.companion,船宿:rec.fdName,港:rec.port,連絡先:rec.tel,座席:rec.seat,天気:rec.weather,風向:rec.windDir,風速:rec.windSpeed,潮回り:rec.tide,気温:rec.temp,水温:rec.waterTemp,竿:rec.rod,リール:rec.reel,道糸号数:rec.line,仕掛け:rec.shikake,ハリス号数:rec.harisGo,ハリス長さm:rec.harisM,針種類:rec.hookType,針サイズ号:rec.hookSize,オモリ号:rec.omori,釣果:fs,メモ:rec.memo})
+      body:JSON.stringify({日付:rec.date,釣りもの:rec.target,同行者:rec.companion,船宿:rec.fdName,港:rec.port,連絡先:rec.tel,出船時間:rec.departure,座席:rec.seat,天気:rec.weather,風向:rec.windDir,風速:rec.windSpeed,潮回り:rec.tide,気温:rec.temp,水温:rec.waterTemp,竿:rec.rod,リール:rec.reel,道糸号数:rec.line,仕掛け:rec.shikake,ハリス号数:rec.harisGo,ハリス長さm:rec.harisM,針種類:rec.hookType,針サイズ号:rec.hookSize,オモリ号:rec.omori,釣果:fs,メモ:rec.memo})
     });
   }catch(e){console.log("GAS error",e);}
 }
