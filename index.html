@@ -215,17 +215,17 @@ function renderAdd(){
     <h2 style="font-size:16px;color:#e8d48a;letter-spacing:2px;margin-bottom:18px">⚓ 新しい釣行を記録</h2>
     <div class="card">
       <div class="sec">📅 基本情報</div>
-      <div class="field"><label class="lbl">日付</label><input type="date" value="${form.date}" onchange="form.date=this.value"></div>
+      <div class="field"><label class="lbl">釣りもの</label>
+        <div>${makeChips(TARGETS,form.target,"target")}</div>
+        ${form.target==="その他"?`<input placeholder="釣りものを入力" value="${esc(form.targetCustom)}" onchange="form.targetCustom=this.value" style="margin-top:7px">`:""}
+      </div>
+      <div class="field"><label class="lbl">日付</label><input type="date" id="inp-date" value="${form.date}" onchange="form.date=this.value"></div>
       <div class="field"><label class="lbl">天気</label><div>${makeChips(WEATHER,form.weather,"weather")}</div></div>
       <div class="g2">
         <div class="field"><label class="lbl">気温(℃)</label><input type="number" placeholder="20" value="${form.temp}" onchange="form.temp=this.value"></div>
         <div class="field"><label class="lbl">水温(℃)</label><input type="number" placeholder="18" value="${form.waterTemp}" onchange="form.waterTemp=this.value"></div>
       </div>
       <div class="field"><label class="lbl">潮回り</label><div>${makeChips(TIDE,form.tide,"tide")}</div></div>
-      <div class="field"><label class="lbl">釣りもの</label>
-        <div>${makeChips(TARGETS,form.target,"target")}</div>
-        ${form.target==="その他"?`<input placeholder="釣りものを入力" value="${esc(form.targetCustom)}" onchange="form.targetCustom=this.value" style="margin-top:7px">`:""}
-      </div>
     </div>
     <div class="card">
       <div class="sec">🏠 船宿</div>
@@ -240,12 +240,12 @@ function renderAdd(){
         <button class="btn-ghost" onclick="doSearch()" style="white-space:nowrap">検索</button>
       </div>
       <div id="sr"></div>
-      <div class="field"><label class="lbl">船宿名</label><input placeholder="〇〇丸" value="${esc(form.fdName)}" onchange="form.fdName=this.value"></div>
+      <div class="field"><label class="lbl">船宿名</label><input id="inp-fdname" placeholder="〇〇丸" value="${esc(form.fdName)}" onchange="form.fdName=this.value"></div>
       <div class="g2">
-        <div class="field"><label class="lbl">港</label><input placeholder="〇〇港" value="${esc(form.port)}" onchange="form.port=this.value"></div>
-        <div class="field"><label class="lbl">連絡先</label><input placeholder="電話番号" value="${esc(form.tel)}" onchange="form.tel=this.value"></div>
+        <div class="field"><label class="lbl">港</label><input id="inp-port" placeholder="〇〇港" value="${esc(form.port)}" onchange="form.port=this.value"></div>
+        <div class="field"><label class="lbl">連絡先</label><input id="inp-tel" placeholder="電話番号" value="${esc(form.tel)}" onchange="form.tel=this.value"></div>
       </div>
-      ${form.fdName&&!fds.find(f=>f.name===form.fdName)?`<button class="btn-ghost" style="font-size:11px;padding:5px 11px" onclick="quickSaveFD()">＋ 船宿リストに保存</button>`:""}
+      <button class="btn-ghost" style="font-size:11px;padding:5px 11px" onclick="quickSaveFD()">＋ 船宿リストに保存</button>
     </div>
     <div class="card">
       <div class="sec">🚢 乗船位置</div>
@@ -310,8 +310,18 @@ window.pickFD=function(id){
   render();
 };
 window.quickSaveFD=function(){
-  fds=[{id:Date.now(),name:form.fdName,port:form.port,tel:form.tel,memo:"",fav:false},...fds];
-  saveFds();render();
+  const name=ge("inp-fdname")?ge("inp-fdname").value.trim():form.fdName;
+  const port=ge("inp-port")?ge("inp-port").value:form.port;
+  const tel=ge("inp-tel")?ge("inp-tel").value:form.tel;
+  if(!name){alert("船宿名を入力してください");return;}
+  form.fdName=name;form.port=port;form.tel=tel;
+  if(!fds.find(f=>f.name===name)){
+    fds=[{id:Date.now(),name:name,port:port,tel:tel,memo:"",fav:false},...fds];
+    saveFds();
+    alert("「"+name+"」を船宿リストに保存しました！");
+  } else {
+    alert("この船宿名はすでに登録されています");
+  }
 };
 window.doSearch=function(){
   const sq=ge("sq");if(!sq)return;
