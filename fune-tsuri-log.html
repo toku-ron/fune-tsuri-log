@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚓ 船釣りログ</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:linear-gradient(160deg,#04111d,#081a2e 50%,#051420);min-height:100vh;font-family:Georgia,serif;color:#d4e8f4;}
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:#0b1f35;}::-webkit-scrollbar-thumb{background:#1a4a6a;border-radius:3px;}
+.header{background:rgba(4,17,29,0.95);border-bottom:1px solid rgba(180,150,60,0.25);padding:13px 16px;position:sticky;top:0;z-index:20;}
+.header-top{display:flex;justify-content:space-between;align-items:center;}
+.title{font-size:18px;font-weight:700;color:#e8d48a;letter-spacing:2px;}
+.subtitle{font-size:10px;color:#6a9ab8;letter-spacing:2px;margin-top:2px;}
+.tabs{display:flex;margin-top:10px;}
+.tab{padding:6px 14px;font-size:11px;letter-spacing:1px;cursor:pointer;border:none;border-radius:5px 5px 0 0;background:transparent;color:#5a8aaa;border-bottom:2px solid transparent;font-family:Georgia,serif;}
+.tab.active{background:rgba(180,150,60,0.18);color:#e8d48a;border-bottom:2px solid #c8a830;}
+.wrap{max-width:500px;margin:0 auto;padding:18px 14px 80px;}
+.card{background:rgba(255,255,255,0.03);border:1px solid rgba(180,150,60,0.15);border-radius:12px;padding:16px;margin-bottom:12px;}
+.sec{font-size:10px;letter-spacing:3px;color:#c8a830;text-transform:uppercase;margin-bottom:12px;}
+.lbl{display:block;font-size:10px;letter-spacing:2px;color:#7aacb8;margin-bottom:4px;}
+.field{margin-bottom:11px;}
+input,textarea{width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(120,160,190,0.22);border-radius:8px;color:#d4e8f4;padding:9px 12px;font-size:13px;outline:none;box-sizing:border-box;font-family:Georgia,serif;}
+textarea{resize:vertical;height:80px;}
+.chip{display:inline-block;padding:8px 13px;border-radius:16px;font-size:12px;cursor:pointer;margin:3px 3px 0 0;background:rgba(255,255,255,0.04);border:1px solid rgba(120,160,190,0.18);color:#7aacb8;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+.chip.on{background:rgba(180,150,60,0.28);border:1px solid #c8a830;color:#e8d48a;}
+.btn-gold{background:linear-gradient(135deg,#b8940a,#7a5e00);color:#fff8e0;border:none;border-radius:9px;padding:10px 20px;font-size:13px;cursor:pointer;font-weight:700;font-family:Georgia,serif;}
+.btn-ghost{background:none;border:1px solid rgba(120,160,190,0.3);color:#7aacb8;border-radius:7px;padding:7px 13px;cursor:pointer;font-size:12px;font-family:Georgia,serif;}
+.btn-danger{background:rgba(150,30,30,0.18);border:1px solid rgba(160,40,40,0.32);color:#e09090;border-radius:7px;padding:7px 13px;cursor:pointer;font-size:12px;font-family:Georgia,serif;}
+.btn-full{width:100%;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.rec-card{background:rgba(255,255,255,0.03);border:1px solid rgba(180,150,60,0.15);border-radius:11px;padding:14px 16px;margin-bottom:11px;cursor:pointer;transition:background 0.15s;}
+.rec-card:hover{background:rgba(180,150,60,0.08);}
+.fd-card{background:rgba(255,255,255,0.03);border:1px solid rgba(180,150,60,0.15);border-radius:11px;padding:13px 15px;margin-bottom:9px;}
+.fish-card{background:rgba(0,0,0,0.2);border:1px solid rgba(120,160,190,0.15);border-radius:9px;padding:12px;margin-bottom:9px;}
+.dr{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(120,160,190,0.08);font-size:13px;}
+.dl{color:#6a9ab8;}.dv{color:#d4e8f4;}
+.empty{text-align:center;padding:70px 0;color:#3a6a88;}
+.stepper{display:flex;align-items:center;background:rgba(255,255,255,0.05);border:1px solid rgba(120,160,190,0.2);border-radius:7px;overflow:hidden;width:fit-content;}
+.stepper button{background:none;border:none;color:#7aacb8;font-size:18px;padding:5px 14px;cursor:pointer;font-family:Georgia,serif;line-height:1;}
+.stepper span{color:#d4e8f4;font-size:17px;font-weight:700;min-width:30px;text-align:center;}
+.code-box{background:#020a12;border:1px solid rgba(120,160,190,0.18);border-radius:7px;padding:11px;font-size:11px;color:#7aecb8;font-family:monospace;line-height:1.7;white-space:pre-wrap;margin-bottom:8px;}
+.steps{background:rgba(0,0,0,0.3);border-radius:9px;padding:13px;margin-bottom:14px;font-size:12px;line-height:2.1;color:#aac8d8;}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="title">⚓ 船釣りログ</div>
+      <div class="subtitle" id="subtitle">0 RECORDS</div>
+    </div>
+    <div id="hbtn"></div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" id="tab-rec" onclick="switchTab('rec')">📋 釣行</button>
+    <button class="tab" id="tab-fd" onclick="switchTab('fd')">🏠 船宿</button>
+    <button class="tab" id="tab-set" onclick="switchTab('set')">⚙️ 設定</button>
+  </div>
+</div>
+<div class="wrap" id="main"></div>
+
+<script>
+const SK_R="fune-rec-v5",SK_F="fune-fd-v5",SK_G="fune-gas-v5";
+const SEATS=["右舷 みよし","右舷 中央","右舷 とも","左舷 みよし","左舷 中央","左舷 とも","胴の間","その他"];
+const WEATHER=["☀️ 晴れ","⛅ 曇り","🌧️ 雨","🌬️ 風強い"];
+const TIDE=["大潮","中潮","小潮","長潮","若潮"];
+const SHIKAKE=["天秤仕掛け","胴付き仕掛け","コマセ仕掛け","泳がせ仕掛け","落とし込み","ルアー","テンヤ","タイラバ","その他"];
+const HOOKS=["丸セイゴ","チヌ針","伊勢尼","袖針","ムツ針","メバル針","カワハギ針","タイ針","ヒラマサ針","その他"];
+const FISH=["マダイ","アジ","サバ","イサキ","ヒラメ","カレイ","メバル","カサゴ","ワラサ","ブリ","スズキ","マゴチ","タチウオ","キス","アマダイ","オニカサゴ","カワハギ","クロダイ","マハタ","イカ","タコ","その他"];
+const TARGETS=["マダイ","LTアジ","アジ","イサキ","ヒラメ","カレイ","メバル","カサゴ","ワラサ・ブリ","スズキ","マゴチ","タチウオ","キス","アマダイ","オニカサゴ","カワハギ","クロダイ","マハタ","イカ","タコ","ジギング","タイラバ","その他"];
+const GAS_CODE=`function doPost(e) {\n  const sheet = SpreadsheetApp\n    .getActiveSpreadsheet().getActiveSheet();\n  const data = JSON.parse(e.postData.contents);\n  if (sheet.getLastRow() === 0) {\n    sheet.appendRow(Object.keys(data));\n  }\n  sheet.appendRow(Object.values(data));\n  return ContentService.createTextOutput("ok")\n    .setMimeType(ContentService.MimeType.TEXT);\n}`;
+
+let recs=[],fds=[],gasUrl="";
+let curTab="rec",curDet=null,curFdF=null,addMode=false;
+let form={},fishList=[];
+
+function load(){
+  try{const r=localStorage.getItem(SK_R);if(r)recs=JSON.parse(r);}catch{}
+  try{const f=localStorage.getItem(SK_F);if(f)fds=JSON.parse(f);}catch{}
+  try{const g=localStorage.getItem(SK_G);if(g)gasUrl=g;}catch{}
+}
+function saveRecs(){try{localStorage.setItem(SK_R,JSON.stringify(recs));}catch{}}
+function saveFds(){try{localStorage.setItem(SK_F,JSON.stringify(fds));}catch{}}
+function ge(id){return document.getElementById(id);}
+
+function newFish(){return{id:Date.now()+Math.random(),species:"",custom:"",length:"",weight:"",count:1};}
+function newForm(){
+  form={date:new Date().toISOString().split("T")[0],fdId:"",fdName:"",port:"",tel:"",target:"",targetCustom:"",seat:"",weather:"",tide:"",temp:"",waterTemp:"",rod:"",reel:"",line:"",shikake:"",harisGo:"",harisM:"",hookType:"",hookSize:"",omori:"",memo:""};
+  fishList=[newFish()];
+}
+
+function fsum(fish){
+  const r=fish.filter(f=>f.species||f.custom).map(f=>`${f.species==="その他"?f.custom:f.species}×${f.count}`).join(" / ");
+  return r||"釣果なし";
+}
+
+function switchTab(t){
+  curTab=t;curDet=null;curFdF=null;addMode=false;
+  ["rec","fd","set"].forEach(k=>ge("tab-"+k).classList.toggle("active",k===t));
+  render();
+}
+
+function render(){
+  const hb=ge("hbtn");
+  ge("subtitle").textContent=recs.length+" RECORDS";
+  if(addMode){
+    hb.innerHTML=`<button class="btn-ghost" onclick="addMode=false;render()">← 戻る</button>`;
+    renderAdd();return;
+  }
+  if(curDet){
+    hb.innerHTML=`<button class="btn-ghost" onclick="curDet=null;render()">← 戻る</button>`;
+    renderDetail();return;
+  }
+  if(curFdF!==null){
+    hb.innerHTML=`<button class="btn-ghost" onclick="curFdF=null;render()">← 戻る</button>`;
+    renderFdForm();return;
+  }
+  if(curTab==="rec"){hb.innerHTML=`<button class="btn-gold" onclick="newForm();addMode=true;render()">＋ 記録</button>`;renderRecList();}
+  else if(curTab==="fd"){hb.innerHTML=`<button class="btn-gold" onclick="curFdF={id:null,name:'',port:'',tel:'',memo:'',fav:false};render()">＋ 追加</button>`;renderFdList();}
+  else{hb.innerHTML="";renderSettings();}
+}
+
+function dr(l,v){return v?`<div class="dr"><span class="dl">${l}</span><span class="dv">${v}</span></div>`:""}
+
+function renderRecList(){
+  const m=ge("main");
+  if(!recs.length){m.innerHTML=`<div class="empty"><div style="font-size:48px;margin-bottom:12px">⚓</div><div style="color:#5a8aaa;font-size:15px">まだ記録がありません</div><div style="font-size:12px;margin-top:6px">「＋ 記録」から追加しましょう</div></div>`;return;}
+  m.innerHTML=recs.map((r,i)=>`
+    <div class="rec-card" onclick="curDet=recs[${i}];render()">
+      <div style="display:flex;justify-content:space-between">
+        <div style="flex:1">
+          <div style="font-size:15px;font-weight:700;color:#e8d48a">${esc(r.fdName)||"船宿不明"}</div>
+          <div style="font-size:12px;color:#7aacb8;margin-top:2px">${esc(r.port)}${r.seat?" · "+esc(r.seat):""}</div>
+          ${r.target?`<div style="font-size:12px;color:#c8a830;margin-top:3px">🎯 ${esc(r.target==="その他"?r.targetCustom:r.target)}</div>`:""}
+          <div style="font-size:12px;color:#aac8d8;margin-top:3px">🐟 ${esc(fsum(r.fish))}</div>
+        </div>
+        <div style="text-align:right;font-size:11px;color:#4a7a98">
+          <div>${r.date}</div><div style="margin-top:2px">${r.weather||""}</div><div>${r.tide||""}</div>
+        </div>
+      </div>
+    </div>`).join("");
+}
+
+function renderDetail(){
+  const r=curDet;
+  ge("main").innerHTML=`
+    <div class="card" style="border-color:rgba(180,150,60,0.4)">
+      <div style="font-size:18px;font-weight:700;color:#e8d48a">${esc(r.fdName)||"船宿不明"}</div>
+      <div style="font-size:12px;color:#6a9ab8;margin-top:3px">${r.date}　${esc(r.port)}　${esc(r.seat)}</div>
+      ${r.tel?`<div style="font-size:12px;color:#5a8aaa;margin-top:2px">📞 ${esc(r.tel)}</div>`:""}
+    </div>
+    <div class="card"><div class="sec">🐟 釣果</div>
+      ${r.fish.map(f=>`<div style="display:flex;gap:12px;padding:8px 0;border-bottom:1px solid rgba(120,160,190,0.1);font-size:13px;align-items:center">
+        <span style="color:#e8d48a;font-weight:700;min-width:80px">${esc(f.species==="その他"?f.custom:f.species)||"—"}</span>
+        ${f.length?`<span style="color:#aac8d8">${f.length}cm</span>`:""}
+        ${f.weight?`<span style="color:#aac8d8">${f.weight}g</span>`:""}
+        <span style="color:#7aacb8;margin-left:auto">×${f.count}匹</span>
+      </div>`).join("")}
+    </div>
+    <div class="card"><div class="sec">🌊 状況</div>
+      ${dr("釣りもの",r.target==="その他"?r.targetCustom:r.target)}
+      ${dr("天気",r.weather)}${dr("潮回り",r.tide)}
+      ${dr("気温",r.temp?r.temp+"℃":"")}${dr("水温",r.waterTemp?r.waterTemp+"℃":"")}
+    </div>
+    ${(r.rod||r.reel||r.line)?`<div class="card"><div class="sec">🎣 タックル</div>${dr("竿",r.rod)}${dr("リール",r.reel)}${dr("道糸",r.line?r.line+"号":"")}</div>`:""}
+    ${(r.shikake||r.harisGo||r.hookType||r.omori)?`<div class="card"><div class="sec">🪝 仕掛け</div>${dr("種類",r.shikake)}${dr("ハリス",r.harisGo?r.harisGo+"号"+(r.harisM?" "+r.harisM+"m":""):"")}${dr("針",r.hookType?r.hookType+(r.hookSize?" "+r.hookSize+"号":""):"")}${dr("オモリ",r.omori?r.omori+"号":"")}</div>`:""}
+    ${r.memo?`<div class="card"><div class="sec">📝 メモ</div><div style="font-size:13px;color:#b0ccd8;line-height:1.8">${esc(r.memo)}</div></div>`:""}
+    <button class="btn-danger btn-full" onclick="delRec()">この記録を削除する</button>`;
+}
+
+function delRec(){recs=recs.filter(x=>x.id!==curDet.id);saveRecs();curDet=null;render();}
+
+function esc(s){if(!s)return"";return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+
+function makeChips(list,selected,key){
+  return list.map(s=>`<span class="chip${s===selected?" on":""}" data-key="${key}" data-val="${esc(s)}">${s}</span>`).join("");
+}
+
+function makeFishChips(list,selected,idx){
+  return list.map(s=>`<span class="chip${s===selected?" on":""}" data-fishidx="${idx}" data-val="${esc(s)}">${s}</span>`).join("");
+}
+
+document.addEventListener("click",function(e){
+  const chip=e.target.closest(".chip");
+  if(!chip)return;
+
+  if(chip.dataset.fishidx!==undefined){
+    const idx=parseInt(chip.dataset.fishidx);
+    fishList[idx].species=chip.dataset.val;
+    render();
+    return;
+  }
+
+  if(chip.dataset.key){
+    const key=chip.dataset.key;
+    const val=chip.dataset.val;
+    form[key]=val;
+    if(key==="target"||key==="shikake"||key==="hookType"){
+      render();
+    } else {
+      chip.closest("div").querySelectorAll(".chip").forEach(c=>c.classList.remove("on"));
+      chip.classList.add("on");
+    }
+  }
+});
+
+window.setChip=function(){};
+window.setFishChip=function(){};
+
+function renderAdd(){
+  const m=ge("main");
+  const favFds=fds.filter(f=>f.fav);
+  m.innerHTML=`
+    <h2 style="font-size:16px;color:#e8d48a;letter-spacing:2px;margin-bottom:18px">⚓ 新しい釣行を記録</h2>
+    <div class="card">
+      <div class="sec">📅 基本情報</div>
+      <div class="field"><label class="lbl">日付</label><input type="date" value="${form.date}" onchange="form.date=this.value"></div>
+      <div class="field"><label class="lbl">天気</label><div>${makeChips(WEATHER,form.weather,"weather")}</div></div>
+      <div class="g2">
+        <div class="field"><label class="lbl">気温(℃)</label><input type="number" placeholder="20" value="${form.temp}" onchange="form.temp=this.value"></div>
+        <div class="field"><label class="lbl">水温(℃)</label><input type="number" placeholder="18" value="${form.waterTemp}" onchange="form.waterTemp=this.value"></div>
+      </div>
+      <div class="field"><label class="lbl">潮回り</label><div>${makeChips(TIDE,form.tide,"tide")}</div></div>
+      <div class="field"><label class="lbl">釣りもの</label>
+        <div>${makeChips(TARGETS,form.target,"target")}</div>
+        ${form.target==="その他"?`<input placeholder="釣りものを入力" value="${esc(form.targetCustom)}" onchange="form.targetCustom=this.value" style="margin-top:7px">`:""}
+      </div>
+    </div>
+    <div class="card">
+      <div class="sec">🏠 船宿</div>
+      ${favFds.length?`<div style="margin-bottom:10px">
+        <div style="font-size:10px;color:#c8a830;letter-spacing:2px;margin-bottom:5px">⭐ お気に入り</div>
+        ${favFds.map(fd=>`<div onclick="pickFD('${fd.id}')" style="padding:7px 11px;background:${form.fdId==fd.id?"rgba(180,150,60,0.22)":"rgba(180,150,60,0.06)"};border:1px solid ${form.fdId==fd.id?"#c8a830":"rgba(180,150,60,0.2)"};border-radius:7px;margin-bottom:5px;cursor:pointer;display:flex;justify-content:space-between">
+          <span style="color:#e8d48a">${esc(fd.name)}</span><span style="color:#6a9ab8;font-size:12px">${esc(fd.port)}</span>
+        </div>`).join("")}
+      </div>`:""}
+      <div style="display:flex;gap:7px;margin-bottom:7px">
+        <input id="sq" placeholder="船宿を検索…" style="flex:1" onkeydown="if(event.key==='Enter')doSearch()">
+        <button class="btn-ghost" onclick="doSearch()" style="white-space:nowrap">検索</button>
+      </div>
+      <div id="sr"></div>
+      <div class="field"><label class="lbl">船宿名</label><input placeholder="〇〇丸" value="${esc(form.fdName)}" onchange="form.fdName=this.value"></div>
+      <div class="g2">
+        <div class="field"><label class="lbl">港</label><input placeholder="〇〇港" value="${esc(form.port)}" onchange="form.port=this.value"></div>
+        <div class="field"><label class="lbl">連絡先</label><input placeholder="電話番号" value="${esc(form.tel)}" onchange="form.tel=this.value"></div>
+      </div>
+      ${form.fdName&&!fds.find(f=>f.name===form.fdName)?`<button class="btn-ghost" style="font-size:11px;padding:5px 11px" onclick="quickSaveFD()">＋ 船宿リストに保存</button>`:""}
+    </div>
+    <div class="card">
+      <div class="sec">🚢 乗船位置</div>
+      <div class="field"><label class="lbl">座席</label><div>${makeChips(SEATS,form.seat,"seat")}</div></div>
+    </div>
+    <div class="card">
+      <div class="sec">🎣 タックル</div>
+      <div class="field"><label class="lbl">竿</label><input placeholder="例：シマノ 深海 200-300" value="${esc(form.rod)}" onchange="form.rod=this.value"></div>
+      <div class="field"><label class="lbl">リール</label><input placeholder="例：フォースマスター 600" value="${esc(form.reel)}" onchange="form.reel=this.value"></div>
+      <div class="field"><label class="lbl">道糸（号）</label><input type="number" step="0.1" placeholder="3" value="${form.line}" onchange="form.line=this.value"></div>
+    </div>
+    <div class="card">
+      <div class="sec">🪝 仕掛け</div>
+      <div class="field"><label class="lbl">仕掛けの種類</label><div>${makeChips(SHIKAKE,form.shikake,"shikake")}</div></div>
+      <div class="g2">
+        <div class="field"><label class="lbl">ハリス号数</label><input type="number" step="0.1" placeholder="2" value="${form.harisGo}" onchange="form.harisGo=this.value"></div>
+        <div class="field"><label class="lbl">ハリス長さ(m)</label><input type="number" step="0.5" placeholder="1.5" value="${form.harisM}" onchange="form.harisM=this.value"></div>
+      </div>
+      <div class="field"><label class="lbl">針の種類</label><div>${makeChips(HOOKS,form.hookType,"hookType")}</div></div>
+      <div class="g2">
+        <div class="field"><label class="lbl">針サイズ（号）</label><input type="number" placeholder="10" value="${form.hookSize}" onchange="form.hookSize=this.value"></div>
+        <div class="field"><label class="lbl">オモリ（号）</label><input type="number" placeholder="60" value="${form.omori}" onchange="form.omori=this.value"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="sec">🐟 釣果（複数可）</div>
+      ${fishList.map((f,i)=>`
+        <div class="fish-card">
+          <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+            <span style="font-size:11px;color:#c8a830">魚 #${i+1}</span>
+            ${fishList.length>1?`<button class="btn-danger" style="padding:2px 9px;font-size:11px" onclick="fishList.splice(${i},1);render()">削除</button>`:""}
+          </div>
+          <div class="field"><label class="lbl">魚種</label>
+            <div>${makeFishChips(FISH,f.species,i)}</div>
+            ${f.species==="その他"?`<input placeholder="魚の名前" value="${esc(f.custom)}" onchange="fishList[${i}].custom=this.value" style="margin-top:7px">`:""}
+          </div>
+          <div class="g2">
+            <div class="field"><label class="lbl">長さ(cm)</label><input type="number" placeholder="35" value="${f.length}" onchange="fishList[${i}].length=this.value"></div>
+            <div class="field"><label class="lbl">重さ(g)</label><input type="number" placeholder="800" value="${f.weight}" onchange="fishList[${i}].weight=this.value"></div>
+          </div>
+          <div class="field"><label class="lbl">釣れた数</label>
+            <div class="stepper">
+              <button onclick="if(fishList[${i}].count>1){fishList[${i}].count--;ge('cnt${i}').textContent=fishList[${i}].count;}">−</button>
+              <span id="cnt${i}">${f.count}</span>
+              <button onclick="fishList[${i}].count++;ge('cnt${i}').textContent=fishList[${i}].count;">＋</button>
+            </div>
+          </div>
+        </div>`).join("")}
+      <button class="btn-ghost btn-full" onclick="fishList.push(newFish());render()">＋ 魚を追加</button>
+    </div>
+    <div class="card">
+      <div class="sec">📝 メモ</div>
+      <textarea placeholder="ポイント、タナ、コマセ量など…" onchange="form.memo=this.value">${esc(form.memo)}</textarea>
+    </div>
+    <button class="btn-gold btn-full" id="savebtn" onclick="handleSave()">航海記録を保存する</button>`;
+}
+
+window.pickFD=function(id){
+  const fd=fds.find(f=>String(f.id)===String(id));
+  if(!fd)return;
+  form.fdId=fd.id;form.fdName=fd.name;form.port=fd.port;form.tel=fd.tel;
+  render();
+};
+window.quickSaveFD=function(){
+  fds=[{id:Date.now(),name:form.fdName,port:form.port,tel:form.tel,memo:"",fav:false},...fds];
+  saveFds();render();
+};
+window.doSearch=function(){
+  const sq=ge("sq");if(!sq)return;
+  const q=sq.value.toLowerCase();
+  const res=fds.filter(f=>f.name.toLowerCase().includes(q)||f.port.toLowerCase().includes(q));
+  const sr=ge("sr");if(!sr)return;
+  sr.innerHTML=res.map(fd=>`<div onclick="pickFD('${fd.id}')" style="padding:7px 11px;background:rgba(180,150,60,0.08);border:1px solid rgba(180,150,60,0.2);border-radius:7px;margin-bottom:4px;cursor:pointer;display:flex;justify-content:space-between;font-size:12px"><span style="color:#e8d48a">${esc(fd.name)}</span><span style="color:#6a9ab8">${esc(fd.port)}</span></div>`).join("");
+};
+
+window.handleSave=async function(){
+  const btn=ge("savebtn");if(btn)btn.textContent="保存中…";
+  const rec={...form,id:Date.now(),fish:JSON.parse(JSON.stringify(fishList))};
+  recs=[rec,...recs];saveRecs();
+  await sendSheet(rec);
+  if(btn)btn.textContent="✅ 保存しました！";
+  setTimeout(()=>{addMode=false;switchTab("rec");},900);
+};
+
+async function sendSheet(rec){
+  if(!gasUrl)return;
+  try{
+    const fs=rec.fish.filter(f=>f.species||f.custom).map(f=>`${f.species==="その他"?f.custom:f.species}${f.length?" "+f.length+"cm":""}${f.weight?" "+f.weight+"g":""} ×${f.count}匹`).join(" / ");
+    await fetch(gasUrl,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({日付:rec.date,釣りもの:rec.target==="その他"?rec.targetCustom:rec.target,船宿:rec.fdName,港:rec.port,連絡先:rec.tel,座席:rec.seat,天気:rec.weather,潮回り:rec.tide,気温:rec.temp,水温:rec.waterTemp,竿:rec.rod,リール:rec.reel,道糸号数:rec.line,仕掛け:rec.shikake,ハリス号数:rec.harisGo,ハリス長さm:rec.harisM,針種類:rec.hookType,針サイズ号:rec.hookSize,オモリ号:rec.omori,釣果:fs,メモ:rec.memo})});
+  }catch(e){console.log("GAS error",e);}
+}
+
+function renderFdList(){
+  const sorted=[...fds].sort((a,b)=>b.fav-a.fav);
+  if(!sorted.length){ge("main").innerHTML=`<div class="empty"><div style="font-size:38px;margin-bottom:8px">🏠</div><div style="color:#5a8aaa">船宿を登録しておくと素早く選べます</div></div>`;return;}
+  ge("main").innerHTML=sorted.map(fd=>`
+    <div class="fd-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:7px">
+            <span style="font-size:15px;font-weight:700;color:#e8d48a">${esc(fd.name)}</span>
+            <span style="font-size:16px;cursor:pointer;opacity:${fd.fav?1:0.3}" onclick="togFav('${fd.id}')">⭐</span>
+          </div>
+          <div style="font-size:12px;color:#7aacb8;margin-top:2px">📍 ${esc(fd.port)}</div>
+          ${fd.tel?`<div style="font-size:12px;color:#7aacb8">📞 ${esc(fd.tel)}</div>`:""}
+          ${fd.memo?`<div style="font-size:11px;color:#5a7a88;margin-top:3px">${esc(fd.memo)}</div>`:""}
+        </div>
+        <div style="display:flex;gap:5px">
+          <button class="btn-ghost" style="padding:4px 10px;font-size:11px" onclick="editFD('${fd.id}')">編集</button>
+          <button class="btn-danger" style="padding:4px 10px;font-size:11px" onclick="deleteFD('${fd.id}')">削除</button>
+        </div>
+      </div>
+    </div>`).join("");
+}
+
+window.togFav=function(id){const i=fds.findIndex(f=>String(f.id)===String(id));if(i>=0){fds[i].fav=!fds[i].fav;saveFds();render();}};
+window.editFD=function(id){curFdF={...fds.find(f=>String(f.id)===String(id))};render();};
+window.deleteFD=function(id){fds=fds.filter(f=>String(f.id)!==String(id));saveFds();render();};
+
+function renderFdForm(){
+  const fd=curFdF;
+  const isEdit=fd.id&&fds.find(f=>f.id===fd.id);
+  ge("main").innerHTML=`
+    <h2 style="font-size:15px;color:#e8d48a;margin:0 0 16px">${isEdit?"船宿を編集":"船宿を登録"}</h2>
+    <div class="card">
+      <div class="field"><label class="lbl">船宿名 *</label><input id="fd-name" placeholder="〇〇丸" value="${esc(fd.name)}"></div>
+      <div class="field"><label class="lbl">港</label><input id="fd-port" placeholder="〇〇港" value="${esc(fd.port)}"></div>
+      <div class="field"><label class="lbl">電話番号</label><input id="fd-tel" placeholder="0467-XX-XXXX" value="${esc(fd.tel)}"></div>
+      <div class="field"><label class="lbl">メモ</label><input id="fd-memo" placeholder="集合時間、駐車場など" value="${esc(fd.memo)}"></div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:6px;cursor:pointer" onclick="curFdF.fav=!curFdF.fav;ge('fav-star').style.opacity=curFdF.fav?1:0.3;ge('fav-lbl').style.color=curFdF.fav?'#e8d48a':'#5a8aaa'">
+        <span id="fav-star" style="font-size:17px;opacity:${fd.fav?1:0.3}">⭐</span>
+        <span id="fav-lbl" style="font-size:12px;color:${fd.fav?"#e8d48a":"#5a8aaa"}">お気に入りに登録する</span>
+      </div>
+    </div>
+    <button class="btn-gold btn-full" onclick="saveFdForm()">保存する</button>`;
+}
+
+window.saveFdForm=function(){
+  const name=ge("fd-name").value.trim();
+  if(!name)return;
+  curFdF.name=name;curFdF.port=ge("fd-port").value;curFdF.tel=ge("fd-tel").value;curFdF.memo=ge("fd-memo").value;
+  const isEdit=curFdF.id&&fds.find(f=>f.id===curFdF.id);
+  if(isEdit){fds=fds.map(f=>f.id===curFdF.id?curFdF:f);}else{fds=[{...curFdF,id:Date.now()},...fds];}
+  saveFds();curFdF=null;render();
+};
+
+function renderSettings(){
+  ge("main").innerHTML=`
+    <h2 style="font-size:16px;color:#e8d48a;letter-spacing:2px;margin-bottom:18px">⚙️ Google スプレッドシート連携</h2>
+    <div class="card">
+      <div style="font-size:12px;color:#7aacb8;line-height:1.9;margin-bottom:14px">釣行を保存するたびに自動でGoogleスプレッドシートに記録されます。設定は一度だけです。</div>
+      <div class="steps">
+        <div style="color:#c8a830;font-weight:700;margin-bottom:4px">📋 設定手順</div>
+        <div><span style="color:#e8d48a">① </span>Googleスプレッドシートを新規作成</div>
+        <div><span style="color:#e8d48a">② </span>「拡張機能」→「Apps Script」を開く</div>
+        <div><span style="color:#e8d48a">③ </span>既存コードを全消し → 下のコードを貼り付けて保存💾</div>
+        <div><span style="color:#e8d48a">④ </span>「デプロイ」→「新しいデプロイ」→「ウェブアプリ」</div>
+        <div><span style="color:#e8d48a">⑤ </span>アクセス権「全員」→「デプロイ」→ 警告は「詳細」→「移動」→「許可」</div>
+        <div><span style="color:#e8d48a">⑥ </span>表示されたURLを下に貼り付けて「保存」</div>
+      </div>
+      <div style="font-size:10px;color:#c8a830;letter-spacing:2px;margin-bottom:7px">APPS SCRIPT コード</div>
+      <div class="code-box">${GAS_CODE.replace(/</g,"&lt;")}</div>
+      <button class="btn-ghost btn-full" id="copybtn" onclick="copyCode()" style="margin-bottom:14px">📋 コードをコピー</button>
+      <label class="lbl">デプロイURL（手順⑥で取得）</label>
+      <div style="display:flex;gap:7px">
+        <input id="gas-inp" placeholder="https://script.google.com/macros/s/..." value="${esc(gasUrl)}" style="flex:1;font-size:11px">
+        <button class="btn-gold" style="padding:8px 14px;white-space:nowrap" onclick="saveGas()">保存</button>
+      </div>
+      <div id="gas-st" style="font-size:11px;margin-top:7px;color:${gasUrl?"#4ab870":"#5a8aaa"}">${gasUrl?"✅ 連携済み — 次の釣行から自動送信されます":"URLを設定するとスプレッドシートに自動保存されます"}</div>
+    </div>`;
+}
+
+window.copyCode=function(){
+  const code=GAS_CODE;
+  navigator.clipboard.writeText(code).then(()=>{const b=ge("copybtn");if(b){b.textContent="✅ コピーしました！";setTimeout(()=>b.textContent="📋 コードをコピー",2000);}}).catch(()=>alert("手動でコードをコピーしてください"));
+};
+window.saveGas=function(){
+  const inp=ge("gas-inp");if(!inp)return;
+  gasUrl=inp.value.trim();
+  try{localStorage.setItem(SK_G,gasUrl);}catch{}
+  const st=ge("gas-st");if(st){st.textContent="✅ 連携済み — 次の釣行から自動送信されます";st.style.color="#4ab870";}
+};
+
+load();render();
+</script>
+</body>
+</html>
