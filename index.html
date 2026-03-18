@@ -29,7 +29,8 @@ textarea{resize:vertical;height:80px;}
 .btn-danger{background:rgba(150,30,30,0.18);border:1px solid rgba(160,40,40,0.32);color:#e09090;border-radius:8px;padding:9px 16px;cursor:pointer;font-size:13px;font-family:Georgia,serif;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
 .btn-full{width:100%;margin-top:4px;}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.rec-card{background:rgba(255,255,255,0.03);border:1px solid rgba(180,150,60,0.15);border-radius:11px;padding:14px 16px;margin-bottom:11px;cursor:pointer;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.rec-card{background:rgba(255,255,255,0.03);border:1px solid rgba(180,150,60,0.15);border-radius:11px;padding:14px 16px;margin-bottom:11px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
 .fd-card{background:rgba(255,255,255,0.03);border:1px solid rgba(180,150,60,0.15);border-radius:11px;padding:13px 15px;margin-bottom:9px;}
 .fish-card{background:rgba(0,0,0,0.2);border:1px solid rgba(120,160,190,0.15);border-radius:9px;padding:14px;margin-bottom:9px;}
 .dr{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(120,160,190,0.08);font-size:13px;}
@@ -41,6 +42,8 @@ textarea{resize:vertical;height:80px;}
 .code-box{background:#020a12;border:1px solid rgba(120,160,190,0.18);border-radius:7px;padding:12px;font-size:11px;color:#7aecb8;font-family:monospace;line-height:1.7;white-space:pre-wrap;margin-bottom:8px;word-break:break-all;}
 .steps{background:rgba(0,0,0,0.3);border-radius:9px;padding:14px;margin-bottom:14px;font-size:13px;line-height:2.2;color:#aac8d8;}
 .hidden{display:none;}
+.add-fish-inp{display:flex;gap:7px;margin-top:8px;}
+.add-fish-inp input{flex:1;}
 </style>
 </head>
 <body>
@@ -59,7 +62,6 @@ textarea{resize:vertical;height:80px;}
   </div>
 </div>
 
-<!-- 各画面 -->
 <div class="wrap hidden" id="page-rec"></div>
 <div class="wrap hidden" id="page-det"></div>
 <div class="wrap hidden" id="page-add"></div>
@@ -67,73 +69,69 @@ textarea{resize:vertical;height:80px;}
 <div class="wrap hidden" id="page-fdform"></div>
 <div class="wrap hidden" id="page-set"></div>
 
-<!-- 記録フォーム（常にDOMに存在、表示/非表示で切り替え） -->
-<div class="wrap hidden" id="page-add">
-</div>
-
 <script>
-const SK_R="fune-r6",SK_F="fune-f6",SK_G="fune-g6";
-const SEATS=["右舷 みよし","右舷 中央","右舷 とも","左舷 みよし","左舷 中央","左舷 とも","胴の間","その他"];
-const WEATHER=["☀️ 晴れ","⛅ 曇り","🌧️ 雨","🌬️ 風強い"];
+const SK_R="fune-r7",SK_F="fune-f7",SK_G="fune-g7",SK_FISH="fune-fish7";
+
+const SEATS=["右舷 みよし","右舷 胴の間","右舷 とも","左舷 みよし","左舷 胴の間","左舷 とも","その他"];
+const WEATHER=["☀️ 晴れ","⛅ 曇り","🌧️ 雨"];
+const WIND_DIR=["北","北東","東","南東","南","南西","西","北西","無風"];
 const TIDE=["大潮","中潮","小潮","長潮","若潮"];
 const SHIKAKE=["天秤仕掛け","胴付き仕掛け","コマセ仕掛け","泳がせ仕掛け","落とし込み","ルアー","テンヤ","タイラバ","その他"];
 const HOOKS=["丸セイゴ","チヌ針","伊勢尼","袖針","ムツ針","メバル針","カワハギ針","タイ針","ヒラマサ針","その他"];
-const FISH=["マダイ","アジ","サバ","イサキ","ヒラメ","カレイ","メバル","カサゴ","ワラサ","ブリ","スズキ","マゴチ","タチウオ","キス","アマダイ","オニカサゴ","カワハギ","クロダイ","マハタ","イカ","タコ","その他"];
-const TARGETS=["マダイ","LTアジ","アジ","イサキ","ヒラメ","カレイ","メバル","カサゴ","ワラサ・ブリ","スズキ","マゴチ","タチウオ","キス","アマダイ","オニカサゴ","カワハギ","クロダイ","マハタ","イカ","タコ","ジギング","タイラバ","その他"];
+const DEFAULT_FISH=["マダイ","アジ","サバ","イサキ","ヒラメ","カレイ","メバル","カサゴ","ワラサ","ブリ","スズキ","マゴチ","タチウオ","キス","アマダイ","オニカサゴ","カワハギ","クロダイ","マハタ","イカ","タコ"];
 const GAS_CODE=`function doPost(e) {\n  const sheet = SpreadsheetApp\n    .getActiveSpreadsheet().getActiveSheet();\n  const data = JSON.parse(e.postData.contents);\n  if (sheet.getLastRow() === 0) {\n    sheet.appendRow(Object.keys(data));\n  }\n  sheet.appendRow(Object.values(data));\n  return ContentService.createTextOutput("ok")\n    .setMimeType(ContentService.MimeType.TEXT);\n}`;
 
-let recs=[],fds=[],gasUrl="";
-let curTab="rec",curDet=null,curFdF=null,curPage="rec";
-// チップの選択状態（フォームとは別管理）
-let sel={target:"",weather:"",tide:"",seat:"",shikake:"",hookType:""};
-let fishSel=[];// 魚種の選択状態
-let fishCounts=[];// 魚の匹数
+let recs=[],fds=[],gasUrl="",customFishDB=[];
 
 function load(){
   try{const r=localStorage.getItem(SK_R);if(r)recs=JSON.parse(r);}catch{}
   try{const f=localStorage.getItem(SK_F);if(f)fds=JSON.parse(f);}catch{}
   try{const g=localStorage.getItem(SK_G);if(g)gasUrl=g;}catch{}
+  try{const cf=localStorage.getItem(SK_FISH);if(cf)customFishDB=JSON.parse(cf);}catch{}
 }
 function saveRecs(){try{localStorage.setItem(SK_R,JSON.stringify(recs));}catch{}}
 function saveFds(){try{localStorage.setItem(SK_F,JSON.stringify(fds));}catch{}}
+function saveFishDB(){try{localStorage.setItem(SK_FISH,JSON.stringify(customFishDB));}catch{}}
+function getFishList(){return [...DEFAULT_FISH,...customFishDB.filter(f=>!DEFAULT_FISH.includes(f))];}
+function addToFishDB(name){if(name&&!DEFAULT_FISH.includes(name)&&!customFishDB.includes(name)){customFishDB.push(name);saveFishDB();}}
+
 function ge(id){return document.getElementById(id);}
 function esc(s){return s?String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"):""}
 
 function showPage(p){
   ["rec","det","add","fd","fdform","set"].forEach(id=>ge("page-"+id).classList.add("hidden"));
   ge("page-"+p).classList.remove("hidden");
-  curPage=p;
+  window.scrollTo(0,0);
 }
 
 function switchTab(t){
-  curTab=t;curDet=null;curFdF=null;
   ["rec","fd","set"].forEach(k=>ge("tab-"+k).classList.toggle("active",k===t));
-  if(t==="rec"){showRec();}
-  else if(t==="fd"){showFd();}
-  else{showSet();}
+  if(t==="rec")showRec();
+  else if(t==="fd")showFd();
+  else showSet();
 }
 
 function updateSubtitle(){ge("subtitle").textContent=recs.length+" RECORDS";}
 
-// ========== チップ共通処理 ==========
-function initChips(containerId, list, selKey, extraFn){
+// チップ初期化
+function initChips(containerId,list,selKey,state,extraFn){
   const c=ge(containerId);if(!c)return;
   c.innerHTML="";
   list.forEach(s=>{
     const sp=document.createElement("span");
-    sp.className="chip"+(sel[selKey]===s?" on":"");
+    sp.className="chip"+(state[selKey]===s?" on":"");
     sp.textContent=s;
     sp.addEventListener("click",function(){
       c.querySelectorAll(".chip").forEach(x=>x.classList.remove("on"));
       sp.classList.add("on");
-      sel[selKey]=s;
+      state[selKey]=s;
       if(extraFn)extraFn(s);
     });
     c.appendChild(sp);
   });
 }
 
-function initFishChips(containerId, list, idx){
+function initFishChips(containerId,list,idx,fishSel){
   const c=ge(containerId);if(!c)return;
   c.innerHTML="";
   list.forEach(s=>{
@@ -144,15 +142,12 @@ function initFishChips(containerId, list, idx){
       c.querySelectorAll(".chip").forEach(x=>x.classList.remove("on"));
       sp.classList.add("on");
       fishSel[idx]=s;
-      // 「その他」の場合カスタム入力を表示
-      const customRow=ge("fish-custom-"+idx);
-      if(customRow)customRow.classList.toggle("hidden",s!=="その他");
     });
     c.appendChild(sp);
   });
 }
 
-// ========== 釣行一覧 ==========
+// ===== 釣行一覧 =====
 function showRec(){
   updateSubtitle();
   ge("hbtn").innerHTML=`<button class="btn-gold" onclick="showAdd()">＋ 記録</button>`;
@@ -166,11 +161,13 @@ function showRec(){
           <div style="flex:1">
             <div style="font-size:15px;font-weight:700;color:#e8d48a">${esc(r.fdName)||"船宿不明"}</div>
             <div style="font-size:12px;color:#7aacb8;margin-top:2px">${esc(r.port)}${r.seat?" · "+esc(r.seat):""}</div>
-            ${r.target?`<div style="font-size:12px;color:#c8a830;margin-top:3px">🎯 ${esc(r.target==="その他"?r.targetCustom:r.target)}</div>`:""}
+            ${r.memo?`<div style="font-size:12px;color:#c8a830;margin-top:3px">📝 ${esc(r.memo.substring(0,30))}${r.memo.length>30?"…":""}</div>`:""}
             <div style="font-size:12px;color:#aac8d8;margin-top:3px">🐟 ${esc(fsum(r.fish))}</div>
           </div>
           <div style="text-align:right;font-size:11px;color:#4a7a98;flex-shrink:0;margin-left:8px">
-            <div>${r.date||""}</div><div style="margin-top:2px">${r.weather||""}</div><div>${r.tide||""}</div>
+            <div>${r.date||""}</div>
+            <div style="margin-top:2px">${r.weather||""}</div>
+            <div>${r.tide||""}</div>
           </div>
         </div>
       </div>`).join("");
@@ -179,16 +176,15 @@ function showRec(){
 }
 
 function fsum(fish){
-  const r=(fish||[]).filter(f=>f.species||f.custom).map(f=>`${f.species==="その他"?f.custom:f.species}×${f.count}`).join(" / ");
+  const r=(fish||[]).filter(f=>f.species).map(f=>`${f.species}×${f.count}`).join(" / ");
   return r||"釣果なし";
 }
 
-// ========== 詳細 ==========
+// ===== 詳細 =====
 function showDet(i){
-  curDet=i;
   ge("hbtn").innerHTML=`<button class="btn-ghost" onclick="showRec()">← 戻る</button>`;
   const r=recs[i];
-  const dr=(l,v)=>v?`<div class="dr"><span class="dl">${l}</span><span class="dv">${esc(v)}</span></div>`:"";
+  const dr=(l,v)=>v?`<div class="dr"><span class="dl">${l}</span><span class="dv">${esc(String(v))}</span></div>`:"";
   ge("page-det").innerHTML=`
     <div class="card" style="border-color:rgba(180,150,60,0.4)">
       <div style="font-size:18px;font-weight:700;color:#e8d48a">${esc(r.fdName)||"船宿不明"}</div>
@@ -197,16 +193,19 @@ function showDet(i){
     </div>
     <div class="card"><div class="sec">🐟 釣果</div>
       ${(r.fish||[]).map(f=>`<div style="display:flex;gap:12px;padding:8px 0;border-bottom:1px solid rgba(120,160,190,0.1);font-size:13px;align-items:center">
-        <span style="color:#e8d48a;font-weight:700;min-width:80px">${esc(f.species==="その他"?f.custom:f.species)||"—"}</span>
+        <span style="color:#e8d48a;font-weight:700;min-width:80px">${esc(f.species)||"—"}</span>
         ${f.length?`<span style="color:#aac8d8">${f.length}cm</span>`:""}
         ${f.weight?`<span style="color:#aac8d8">${f.weight}g</span>`:""}
         <span style="color:#7aacb8;margin-left:auto">×${f.count}匹</span>
       </div>`).join("")}
     </div>
     <div class="card"><div class="sec">🌊 状況</div>
-      ${dr("釣りもの",r.target==="その他"?r.targetCustom:r.target)}
-      ${dr("天気",r.weather)}${dr("潮回り",r.tide)}
-      ${dr("気温",r.temp?r.temp+"℃":"")}${dr("水温",r.waterTemp?r.waterTemp+"℃":"")}
+      ${dr("天気",r.weather)}
+      ${dr("風向",r.windDir)}
+      ${dr("風速",r.windSpeed?r.windSpeed+"m/s":"")}
+      ${dr("潮回り",r.tide)}
+      ${dr("気温",r.temp?r.temp+"℃":"")}
+      ${dr("水温",r.waterTemp?r.waterTemp+"℃":"")}
     </div>
     ${(r.rod||r.reel||r.line)?`<div class="card"><div class="sec">🎣 タックル</div>${dr("竿",r.rod)}${dr("リール",r.reel)}${dr("道糸",r.line?r.line+"号":"")}</div>`:""}
     ${(r.shikake||r.harisGo||r.hookType||r.omori)?`<div class="card"><div class="sec">🪝 仕掛け</div>${dr("種類",r.shikake)}${dr("ハリス",r.harisGo?r.harisGo+"号"+(r.harisM?" "+r.harisM+"m":""):"")}${dr("針",r.hookType?r.hookType+(r.hookSize?" "+r.hookSize+"号":""):"")}${dr("オモリ",r.omori?r.omori+"号":"")}</div>`:""}
@@ -217,33 +216,39 @@ function showDet(i){
 
 function delRec(i){recs.splice(i,1);saveRecs();showRec();}
 
-// ========== 記録フォーム ==========
+// ===== 記録フォーム =====
+let sel={},fishSel=[],fishCounts=[];
 let fishCount=1;
 
 function showAdd(){
-  // チップ選択状態リセット
-  sel={target:"",weather:"",tide:"",seat:"",shikake:"",hookType:""};
+  sel={weather:"",windDir:"",tide:"",seat:"",shikake:"",hookType:""};
   fishSel=[""];
   fishCounts=[1];
   fishCount=1;
 
   ge("hbtn").innerHTML=`<button class="btn-ghost" onclick="showRec()">← 戻る</button>`;
-  const m=ge("page-add");
   const today=new Date().toISOString().split("T")[0];
+  const m=ge("page-add");
 
   m.innerHTML=`
     <h2 style="font-size:16px;color:#e8d48a;letter-spacing:2px;margin-bottom:18px">⚓ 新しい釣行を記録</h2>
+
     <div class="card">
       <div class="sec">📅 基本情報</div>
-      <div class="field"><label class="lbl">釣りもの</label><div class="chips" id="chips-target"></div><input type="text" id="inp-targetCustom" placeholder="釣りものを入力" class="hidden" style="margin-top:8px"></div>
       <div class="field"><label class="lbl">日付</label><input type="date" id="inp-date" value="${today}"></div>
       <div class="field"><label class="lbl">天気</label><div class="chips" id="chips-weather"></div></div>
+      <div class="g2">
+        <div class="field"><label class="lbl">風向</label><div class="chips" id="chips-windDir" style="gap:4px"></div></div>
+        <div class="field"><label class="lbl">風速 (m/s)</label><input type="number" id="inp-windSpeed" placeholder="5" step="0.5"></div>
+      </div>
       <div class="g2">
         <div class="field"><label class="lbl">気温(℃)</label><input type="number" id="inp-temp" placeholder="20"></div>
         <div class="field"><label class="lbl">水温(℃)</label><input type="number" id="inp-waterTemp" placeholder="18"></div>
       </div>
       <div class="field"><label class="lbl">潮回り</label><div class="chips" id="chips-tide"></div></div>
+      <div class="field"><label class="lbl">メモ・釣りもの</label><textarea id="inp-memo" placeholder="釣りもの、ポイント、タナ、コマセ量など…"></textarea></div>
     </div>
+
     <div class="card">
       <div class="sec">🏠 船宿</div>
       <div id="fav-fds"></div>
@@ -259,16 +264,19 @@ function showAdd(){
       </div>
       <button class="btn-ghost" style="font-size:12px;padding:7px 14px" onclick="quickSaveFD()">＋ 船宿リストに保存</button>
     </div>
+
     <div class="card">
       <div class="sec">🚢 乗船位置</div>
       <div class="field"><label class="lbl">座席</label><div class="chips" id="chips-seat"></div></div>
     </div>
+
     <div class="card">
       <div class="sec">🎣 タックル</div>
       <div class="field"><label class="lbl">竿</label><input type="text" id="inp-rod" placeholder="例：シマノ 深海 200-300"></div>
       <div class="field"><label class="lbl">リール</label><input type="text" id="inp-reel" placeholder="例：フォースマスター 600"></div>
       <div class="field"><label class="lbl">道糸（号）</label><input type="number" id="inp-line" step="0.1" placeholder="3"></div>
     </div>
+
     <div class="card">
       <div class="sec">🪝 仕掛け</div>
       <div class="field"><label class="lbl">仕掛けの種類</label><div class="chips" id="chips-shikake"></div></div>
@@ -282,32 +290,25 @@ function showAdd(){
         <div class="field"><label class="lbl">オモリ（号）</label><input type="number" id="inp-omori" placeholder="60"></div>
       </div>
     </div>
-    <div class="card" id="fish-section">
+
+    <div class="card">
       <div class="sec">🐟 釣果（複数可）</div>
       <div id="fish-list"></div>
       <button class="btn-ghost btn-full" onclick="addFishRow()">＋ 魚を追加</button>
     </div>
-    <div class="card">
-      <div class="sec">📝 メモ</div>
-      <textarea id="inp-memo" placeholder="ポイント、タナ、コマセ量など…"></textarea>
-    </div>
-    <button class="btn-gold btn-full" id="savebtn" onclick="handleSave()">航海記録を保存する</button>
-  `;
+
+    <button class="btn-gold btn-full" id="savebtn" onclick="handleSave()">航海記録を保存する</button>`;
 
   // チップ初期化
-  initChips("chips-target",TARGETS,"target",function(v){ge("inp-targetCustom").classList.toggle("hidden",v!=="その他");});
-  initChips("chips-weather",WEATHER,"weather",null);
-  initChips("chips-tide",TIDE,"tide",null);
-  initChips("chips-seat",SEATS,"seat",null);
-  initChips("chips-shikake",SHIKAKE,"shikake",null);
-  initChips("chips-hookType",HOOKS,"hookType",null);
+  initChips("chips-weather",WEATHER,"weather",sel,null);
+  initChips("chips-windDir",WIND_DIR,"windDir",sel,null);
+  initChips("chips-tide",TIDE,"tide",sel,null);
+  initChips("chips-seat",SEATS,"seat",sel,null);
+  initChips("chips-shikake",SHIKAKE,"shikake",sel,null);
+  initChips("chips-hookType",HOOKS,"hookType",sel,null);
 
-  // お気に入り船宿
   renderFavFds();
-
-  // 最初の魚行
   renderFishList();
-
   showPage("add");
 }
 
@@ -318,7 +319,7 @@ function renderFavFds(){
   el.innerHTML=`<div style="font-size:10px;color:#c8a830;letter-spacing:2px;margin-bottom:6px">⭐ お気に入り</div>`+
     favs.map(fd=>`<div onclick="pickFD('${fd.id}')" style="padding:8px 12px;background:rgba(180,150,60,0.06);border:1px solid rgba(180,150,60,0.2);border-radius:8px;margin-bottom:6px;cursor:pointer;display:flex;justify-content:space-between;-webkit-tap-highlight-color:transparent">
       <span style="color:#e8d48a">${esc(fd.name)}</span><span style="color:#6a9ab8;font-size:12px">${esc(fd.port)}</span>
-    </div>`).join("")+"<div style='margin-bottom:8px'></div>";
+    </div>`).join("")+"<div style='margin-bottom:4px'></div>";
 }
 
 function pickFD(id){
@@ -341,25 +342,30 @@ function quickSaveFD(){
   const name=(ge("inp-fdName").value||"").trim();
   if(!name){alert("船宿名を入力してください");return;}
   if(fds.find(f=>f.name===name)){alert("この船宿名はすでに登録されています");return;}
-  fds=[{id:Date.now(),name:name,port:ge("inp-port").value||"",tel:ge("inp-tel").value||"",memo:"",fav:false},...fds];
+  const newFD={id:Date.now(),name:name,port:ge("inp-port").value||"",tel:ge("inp-tel").value||"",memo:"",fav:false};
+  fds=[newFD,...fds];
   saveFds();
-  alert("「"+name+"」を船宿リストに保存しました！");
+  alert("「"+name+"」を船宿リストに保存しました！\n🏠 船宿タブで確認できます。");
 }
 
 function renderFishList(){
   const el=ge("fish-list");if(!el)return;
   el.innerHTML="";
+  const allFish=getFishList();
   for(let i=0;i<fishCount;i++){
     const div=document.createElement("div");
     div.className="fish-card";
-    div.id="fish-row-"+i;
     div.innerHTML=`
       <div style="display:flex;justify-content:space-between;margin-bottom:10px">
         <span style="font-size:11px;color:#c8a830">魚 #${i+1}</span>
-        ${fishCount>1?`<button class="btn-danger" style="padding:3px 10px;font-size:11px" onclick="removeFishRow(${i})">削除</button>`:""}
+        ${fishCount>1?`<button class="btn-danger" style="padding:3px 10px;font-size:11px" data-remove="${i}">削除</button>`:""}
       </div>
-      <div class="field"><label class="lbl">魚種</label><div class="chips" id="chips-fish-${i}"></div>
-        <input type="text" id="fish-custom-${i}" placeholder="魚の名前" class="hidden" style="margin-top:8px">
+      <div class="field"><label class="lbl">魚種</label>
+        <div class="chips" id="chips-fish-${i}"></div>
+        <div class="add-fish-inp">
+          <input type="text" id="fish-newinp-${i}" placeholder="新しい魚種を追加…">
+          <button class="btn-ghost" style="white-space:nowrap;font-size:12px;padding:7px 12px" data-addfish="${i}">追加</button>
+        </div>
       </div>
       <div class="g2">
         <div class="field"><label class="lbl">長さ(cm)</label><input type="number" id="fish-length-${i}" placeholder="35"></div>
@@ -367,20 +373,46 @@ function renderFishList(){
       </div>
       <div class="field"><label class="lbl">釣れた数</label>
         <div class="stepper">
-          <button id="fish-minus-${i}">−</button>
+          <button data-minus="${i}">−</button>
           <span id="fish-cnt-${i}">${fishCounts[i]||1}</span>
-          <button id="fish-plus-${i}">＋</button>
+          <button data-plus="${i}">＋</button>
         </div>
       </div>`;
     el.appendChild(div);
-    initFishChips("chips-fish-"+i,FISH,i);
-    // ステッパーボタン
-    ge("fish-minus-"+i).addEventListener("click",function(){
+
+    // 魚種チップ
+    initFishChips("chips-fish-"+i, allFish, i, fishSel);
+
+    // ステッパー
+    div.querySelector("[data-minus='"+i+"']").addEventListener("click",function(){
       if(fishCounts[i]>1){fishCounts[i]--;ge("fish-cnt-"+i).textContent=fishCounts[i];}
     });
-    ge("fish-plus-"+i).addEventListener("click",function(){
+    div.querySelector("[data-plus='"+i+"']").addEventListener("click",function(){
       fishCounts[i]++;ge("fish-cnt-"+i).textContent=fishCounts[i];
     });
+
+    // 新魚種追加
+    div.querySelector("[data-addfish='"+i+"']").addEventListener("click",function(){
+      const inp=ge("fish-newinp-"+i);
+      const name=(inp.value||"").trim();
+      if(!name)return;
+      addToFishDB(name);
+      fishSel[i]=name;
+      inp.value="";
+      // チップを再描画
+      initFishChips("chips-fish-"+i, getFishList(), i, fishSel);
+    });
+
+    // 削除ボタン
+    const removeBtn=div.querySelector("[data-remove='"+i+"']");
+    if(removeBtn){
+      removeBtn.addEventListener("click",function(){
+        fishSel.splice(i,1);
+        fishCounts.splice(i,1);
+        fishCount--;
+        renderFishList();
+      });
+    }
   }
 }
 
@@ -391,37 +423,32 @@ function addFishRow(){
   renderFishList();
 }
 
-function removeFishRow(i){
-  fishSel.splice(i,1);
-  fishCounts.splice(i,1);
-  fishCount--;
-  renderFishList();
-}
-
 async function handleSave(){
-  const btn=ge("savebtn");if(btn){btn.textContent="保存中…";btn.disabled=true;}
+  const btn=ge("savebtn");
+  if(btn){btn.textContent="保存中…";btn.disabled=true;}
 
-  // 魚データ収集
   const fish=[];
   for(let i=0;i<fishCount;i++){
-    fish.push({
-      species:fishSel[i]||"",
-      custom:ge("fish-custom-"+i)?ge("fish-custom-"+i).value:"",
-      length:ge("fish-length-"+i)?ge("fish-length-"+i).value:"",
-      weight:ge("fish-weight-"+i)?ge("fish-weight-"+i).value:"",
-      count:fishCounts[i]||1
-    });
+    const species=fishSel[i]||"";
+    if(species){
+      fish.push({
+        species:species,
+        length:ge("fish-length-"+i)?ge("fish-length-"+i).value:"",
+        weight:ge("fish-weight-"+i)?ge("fish-weight-"+i).value:"",
+        count:fishCounts[i]||1
+      });
+    }
   }
 
   const rec={
     id:Date.now(),
     date:ge("inp-date").value,
-    target:sel.target,
-    targetCustom:ge("inp-targetCustom")?ge("inp-targetCustom").value:"",
     fdName:ge("inp-fdName").value,
     port:ge("inp-port").value,
     tel:ge("inp-tel").value,
     weather:sel.weather,
+    windDir:sel.windDir,
+    windSpeed:ge("inp-windSpeed").value,
     tide:sel.tide,
     temp:ge("inp-temp").value,
     waterTemp:ge("inp-waterTemp").value,
@@ -443,21 +470,21 @@ async function handleSave(){
   saveRecs();
   await sendSheet(rec);
 
-  if(btn){btn.textContent="✅ 保存しました！";}
-  setTimeout(()=>{showRec();},900);
+  if(btn)btn.textContent="✅ 保存しました！";
+  setTimeout(()=>showRec(),900);
 }
 
 async function sendSheet(rec){
   if(!gasUrl)return;
   try{
-    const fs=rec.fish.filter(f=>f.species||f.custom).map(f=>`${f.species==="その他"?f.custom:f.species}${f.length?" "+f.length+"cm":""}${f.weight?" "+f.weight+"g":""} ×${f.count}匹`).join(" / ");
+    const fs=rec.fish.map(f=>`${f.species}${f.length?" "+f.length+"cm":""}${f.weight?" "+f.weight+"g":""} ×${f.count}匹`).join(" / ");
     await fetch(gasUrl,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({日付:rec.date,釣りもの:rec.target==="その他"?rec.targetCustom:rec.target,船宿:rec.fdName,港:rec.port,連絡先:rec.tel,座席:rec.seat,天気:rec.weather,潮回り:rec.tide,気温:rec.temp,水温:rec.waterTemp,竿:rec.rod,リール:rec.reel,道糸号数:rec.line,仕掛け:rec.shikake,ハリス号数:rec.harisGo,ハリス長さm:rec.harisM,針種類:rec.hookType,針サイズ号:rec.hookSize,オモリ号:rec.omori,釣果:fs,メモ:rec.memo})
+      body:JSON.stringify({日付:rec.date,船宿:rec.fdName,港:rec.port,連絡先:rec.tel,座席:rec.seat,天気:rec.weather,風向:rec.windDir,風速:rec.windSpeed,潮回り:rec.tide,気温:rec.temp,水温:rec.waterTemp,竿:rec.rod,リール:rec.reel,道糸号数:rec.line,仕掛け:rec.shikake,ハリス号数:rec.harisGo,ハリス長さm:rec.harisM,針種類:rec.hookType,針サイズ号:rec.hookSize,オモリ号:rec.omori,釣果:fs,メモ:rec.memo})
     });
   }catch(e){console.log("GAS error",e);}
 }
 
-// ========== 船宿 ==========
+// ===== 船宿 =====
 function showFd(){
   updateSubtitle();
   ge("hbtn").innerHTML=`<button class="btn-gold" onclick="showFdForm(null)">＋ 追加</button>`;
@@ -494,51 +521,53 @@ function togFav(id){
 }
 
 function deleteFD(id){
+  if(!confirm("削除しますか？"))return;
   fds=fds.filter(f=>String(f.id)!==String(id));saveFds();showFd();
 }
 
 function showFdForm(id){
-  curFdF=id?fds.find(f=>String(f.id)===String(id)):null;
+  const existing=id?fds.find(f=>String(f.id)===String(id)):null;
   ge("hbtn").innerHTML=`<button class="btn-ghost" onclick="showFd()">← 戻る</button>`;
-  const fd=curFdF||{name:"",port:"",tel:"",memo:"",fav:false};
+  const fd=existing||{name:"",port:"",tel:"",memo:"",fav:false};
+  let favState=fd.fav||false;
+
   ge("page-fdform").innerHTML=`
-    <h2 style="font-size:15px;color:#e8d48a;margin:0 0 18px">${curFdF?"船宿を編集":"船宿を登録"}</h2>
+    <h2 style="font-size:15px;color:#e8d48a;margin:0 0 18px">${existing?"船宿を編集":"船宿を登録"}</h2>
     <div class="card">
       <div class="field"><label class="lbl">船宿名 *</label><input type="text" id="fd-name" placeholder="〇〇丸" value="${esc(fd.name)}"></div>
       <div class="field"><label class="lbl">港</label><input type="text" id="fd-port" placeholder="〇〇港" value="${esc(fd.port)}"></div>
       <div class="field"><label class="lbl">電話番号</label><input type="tel" id="fd-tel" placeholder="0467-XX-XXXX" value="${esc(fd.tel)}"></div>
       <div class="field"><label class="lbl">メモ</label><input type="text" id="fd-memo" placeholder="集合時間、駐車場など" value="${esc(fd.memo)}"></div>
       <div style="display:flex;align-items:center;gap:10px;margin-top:8px;cursor:pointer;-webkit-tap-highlight-color:transparent" id="fav-toggle">
-        <span id="fav-icon" style="font-size:18px;opacity:${fd.fav?1:0.3}">⭐</span>
-        <span id="fav-txt" style="font-size:13px;color:${fd.fav?"#e8d48a":"#5a8aaa"}">お気に入りに登録する</span>
+        <span id="fav-icon" style="font-size:18px;opacity:${favState?1:0.3}">⭐</span>
+        <span id="fav-txt" style="font-size:13px;color:${favState?"#e8d48a":"#5a8aaa"}">お気に入りに登録する</span>
       </div>
     </div>
-    <button class="btn-gold btn-full" onclick="saveFdForm()">保存する</button>`;
-  // お気に入りトグル
-  let favState=fd.fav||false;
+    <button class="btn-gold btn-full" id="fd-save-btn">保存する</button>`;
+
   ge("fav-toggle").addEventListener("click",function(){
     favState=!favState;
     ge("fav-icon").style.opacity=favState?1:0.3;
     ge("fav-txt").style.color=favState?"#e8d48a":"#5a8aaa";
   });
-  ge("fav-toggle")._getFav=function(){return favState;};
+
+  ge("fd-save-btn").addEventListener("click",function(){
+    const name=(ge("fd-name").value||"").trim();
+    if(!name){alert("船宿名を入力してください");return;}
+    const data={name,port:ge("fd-port").value||"",tel:ge("fd-tel").value||"",memo:ge("fd-memo").value||"",fav:favState};
+    if(existing){
+      fds=fds.map(f=>String(f.id)===String(existing.id)?{...f,...data}:f);
+    } else {
+      fds=[{id:Date.now(),...data},...fds];
+    }
+    saveFds();
+    showFd();
+  });
+
   showPage("fdform");
 }
 
-function saveFdForm(){
-  const name=(ge("fd-name").value||"").trim();
-  if(!name){alert("船宿名を入力してください");return;}
-  const favState=ge("fav-toggle")._getFav?ge("fav-toggle")._getFav():false;
-  const data={name,port:ge("fd-port").value||"",tel:ge("fd-tel").value||"",memo:ge("fd-memo").value||"",fav:favState};
-  if(curFdF){
-    fds=fds.map(f=>String(f.id)===String(curFdF.id)?{...f,...data}:f);
-  } else {
-    fds=[{id:Date.now(),...data},...fds];
-  }
-  saveFds();showFd();
-}
-
-// ========== 設定 ==========
+// ===== 設定 =====
 function showSet(){
   ge("hbtn").innerHTML="";
   ge("page-set").innerHTML=`
@@ -555,33 +584,36 @@ function showSet(){
         <div><span style="color:#e8d48a">⑥ </span>表示されたURLを下に貼り付けて「保存」</div>
       </div>
       <div style="font-size:10px;color:#c8a830;letter-spacing:2px;margin-bottom:7px">APPS SCRIPT コード</div>
-      <div class="code-box">${GAS_CODE.replace(/\n/g,"&#10;")}</div>
-      <button class="btn-ghost btn-full" id="copybtn" onclick="copyCode()" style="margin-bottom:16px">📋 コードをコピー</button>
+      <div class="code-box">${GAS_CODE.replace(/\\n/g,"\n")}</div>
+      <button class="btn-ghost btn-full" id="copybtn" style="margin-bottom:16px">📋 コードをコピー</button>
       <div class="field"><label class="lbl">デプロイURL（手順⑥で取得）</label>
         <div style="display:flex;gap:7px">
           <input type="text" id="gas-inp" placeholder="https://script.google.com/macros/s/..." value="${esc(gasUrl)}" style="flex:1;font-size:12px">
-          <button class="btn-gold" style="padding:9px 14px;white-space:nowrap" onclick="saveGas()">保存</button>
+          <button class="btn-gold" id="gas-save-btn" style="padding:9px 14px;white-space:nowrap">保存</button>
         </div>
       </div>
       <div id="gas-st" style="font-size:12px;margin-top:4px;color:${gasUrl?"#4ab870":"#5a8aaa"}">${gasUrl?"✅ 連携済み — 次の釣行から自動送信されます":"URLを設定するとスプレッドシートに自動保存されます"}</div>
     </div>`;
+
+  ge("copybtn").addEventListener("click",function(){
+    const code=GAS_CODE.replace(/\\n/g,"\n");
+    navigator.clipboard.writeText(code).then(()=>{
+      ge("copybtn").textContent="✅ コピーしました！";
+      setTimeout(()=>ge("copybtn").textContent="📋 コードをコピー",2000);
+    }).catch(()=>alert("手動でコードをコピーしてください"));
+  });
+
+  ge("gas-save-btn").addEventListener("click",function(){
+    gasUrl=(ge("gas-inp").value||"").trim();
+    try{localStorage.setItem(SK_G,gasUrl);}catch{}
+    ge("gas-st").textContent="✅ 連携済み — 次の釣行から自動送信されます";
+    ge("gas-st").style.color="#4ab870";
+  });
+
   showPage("set");
 }
 
-function copyCode(){
-  navigator.clipboard.writeText(GAS_CODE.replace(/\\n/g,"\n")).then(()=>{
-    const b=ge("copybtn");if(b){b.textContent="✅ コピーしました！";setTimeout(()=>b.textContent="📋 コードをコピー",2000);}
-  }).catch(()=>alert("手動でコードをコピーしてください"));
-}
-
-function saveGas(){
-  gasUrl=(ge("gas-inp").value||"").trim();
-  try{localStorage.setItem(SK_G,gasUrl);}catch{}
-  const st=ge("gas-st");
-  if(st){st.textContent="✅ 連携済み — 次の釣行から自動送信されます";st.style.color="#4ab870";}
-}
-
-// ========== 起動 ==========
+// ===== 起動 =====
 load();
 showRec();
 </script>
