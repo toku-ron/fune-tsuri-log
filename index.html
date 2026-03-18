@@ -52,6 +52,7 @@ textarea{resize:vertical;height:80px;}
     <div>
       <div class="title">⚓ 船釣りログ</div>
       <div class="subtitle" id="subtitle">0 RECORDS</div>
+      <div style="font-size:9px;color:#3a6a88;letter-spacing:1px;margin-top:1px">v2.0.0 · 船釣りログ</div>
     </div>
     <div id="hbtn"></div>
   </div>
@@ -182,7 +183,11 @@ function fsum(fish){
 
 // ===== 詳細 =====
 function showDet(i){
-  ge("hbtn").innerHTML=`<button class="btn-ghost" onclick="showRec()">← 戻る</button>`;
+  ge("hbtn").innerHTML=`
+    <div style="display:flex;gap:6px">
+      <button class="btn-ghost" style="padding:7px 12px;font-size:12px" onclick="showEdit(${i})">✏️ 編集</button>
+      <button class="btn-ghost" onclick="showRec()">← 戻る</button>
+    </div>`;
   const r=recs[i];
   const dr=(l,v)=>v?`<div class="dr"><span class="dl">${l}</span><span class="dv">${esc(String(v))}</span></div>`:"";
   ge("page-det").innerHTML=`
