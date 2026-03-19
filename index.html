@@ -61,7 +61,7 @@ select option{background:#0b1f35;color:#d4e8f4;}
     <div>
       <div class="title">⚓ 船釣りログ</div>
       <div class="subtitle" id="subtitle">読み込み中…</div>
-      <div class="version">v3.5.0 · Google Sheets連携</div>
+      <div class="version">v3.6.0 · Google Sheets連携</div>
     </div>
     <div id="hbtn"></div>
   </div>
@@ -185,7 +185,12 @@ function init(){
   try{const g=localStorage.getItem(SK_G);if(g)gasUrl=g;}catch{}
   try{const fs=localStorage.getItem("fune-fontsize");if(fs)fontSize=parseInt(fs);}catch{}
   applyFontSize();
-  showRec();
+  // GAS URLが設定済みなら起動時に自動読み込み
+  if(gasUrl&&gasUrl.startsWith("https://script.google.com/macros/s/")){
+    loadFromSheet();
+  } else {
+    showRec();
+  }
 }
 
 function applyFontSize(){
@@ -716,8 +721,9 @@ function showEdit(i){
     weather:r.weather||"",windDir:r.windDir||"",tide:r.tide||"",
     seat:r.seat||"",shikake:r.shikake||"",hookType:r.hookType||""
   };
-  fishSel=(r.fish||[]).map(f=>f.species||"");
-  fishCounts=(r.fish||[]).map(f=>Number(f.count)||1);
+  // species を確実に文字列として取得
+  fishSel=(r.fish||[]).map(f=>typeof f==="string"?f:String(f.species||""));
+  fishCounts=(r.fish||[]).map(f=>Number(typeof f==="object"?f.count:1)||1);
   fishCount=Math.max(1,(r.fish||[]).length);
   ge("hbtn").innerHTML=`<button class="btn-ghost" onclick="showDet(${i})">← 戻る</button>`;
   initForm(r);
