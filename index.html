@@ -228,18 +228,19 @@ function updateSubtitle(){
 
 // ===== Google Sheets 読み込み =====
 async function loadFromSheet(){
-  ge("page-rec").innerHTML=`<div class="loading"><span class="loading-spin">⚓</span>データを読み込み中…<br><span style="font-size:0.8em;color:#4a7a98;margin-top:8px;display:block">10秒でタイムアウトします</span></div>`;
+  ge("page-rec").innerHTML=`<div class="loading"><span class="loading-spin">⚓</span>データを読み込み中…</div>`;
   ge("hbtn").innerHTML="";
   showPage("rec");
 
-  // 10秒タイムアウト
-  const controller=new AbortController();
-  const timer=setTimeout(()=>controller.abort(),10000);
+  // タイムアウト用Promise
+  const timeout=new Promise((_,reject)=>setTimeout(()=>reject(new Error("TIMEOUT")),10000));
 
   try{
-    const res=await fetch(gasUrl+"?t="+Date.now(),{signal:controller.signal});
-    clearTimeout(timer);
-    const data=await res.json();
+    const res=await Promise.race([
+      fetch(gasUrl+"?t="+Date.now()),
+      timeout
+    ]);
+    const data=await Promise.race([res.json(),timeout]);
     recs=data.map(row=>({
       id:String(row["id"]||row["ID"]||"fish-"+Date.now()+Math.random()),
       createdAt:row["作成日時"]||"",
@@ -274,8 +275,7 @@ async function loadFromSheet(){
     updateSubtitle();
     showRec();
   }catch(e){
-    clearTimeout(timer);
-    const isTimeout=e.name==="AbortError";
+    const isTimeout=e.message==="TIMEOUT";
     ge("page-rec").innerHTML=`
       <div class="empty">
         <div style="font-size:36px;margin-bottom:12px">${isTimeout?"⏱️":"⚠️"}</div>
