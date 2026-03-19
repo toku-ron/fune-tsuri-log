@@ -243,9 +243,41 @@ function showPage(p){
 function switchTab(t){
   curTab=t;
   ["rec","fd","set"].forEach(k=>ge("tab-"+k).classList.toggle("active",k===t));
+  // 入力フォームが開いている場合はフォームを消さずにタブ表示だけ切り替える
+  const addPage=ge("page-add");
+  const isFormOpen=addPage&&!addPage.classList.contains("hidden");
+  if(isFormOpen){
+    // フォームを隠して対象タブのページを表示するが、フォームのDOMは保持
+    ["rec","det","add","fd","fdform","set"].forEach(id=>ge("page-"+id).classList.add("hidden"));
+    if(t==="rec"){ge("page-rec").innerHTML=`<div style="text-align:center;padding:40px 20px"><div style="color:#c8a830;font-size:1.1em;margin-bottom:12px">⚠️ 入力中のデータがあります</div><div style="color:#7aacb8;font-size:0.9em;margin-bottom:20px">釣行の入力を続けますか？</div><div style="display:flex;gap:10px;justify-content:center"><button class="btn-gold" onclick="resumeForm()">✏️ 入力に戻る</button><button class="btn-danger" onclick="cancelForm()">破棄して一覧へ</button></div></div>`;ge("page-rec").classList.remove("hidden");}
+    else if(t==="fd"){showFd();}
+    else{showSet();}
+    ge("hbtn").innerHTML=`<button class="btn-ghost" onclick="resumeForm()">← 入力に戻る</button>`;
+    return;
+  }
   if(t==="rec")showRec();
   else if(t==="fd")showFd();
   else showSet();
+}
+
+function resumeForm(){
+  // フォームページを再表示
+  ["rec","det","add","fd","fdform","set"].forEach(id=>ge("page-"+id).classList.add("hidden"));
+  ge("page-add").classList.remove("hidden");
+  curTab="rec";
+  ["rec","fd","set"].forEach(k=>ge("tab-"+k).classList.toggle("active",k==="rec"));
+  if(editIdx>=0){
+    ge("hbtn").innerHTML=`<button class="btn-ghost" onclick="showDet(${editIdx})">← 戻る</button>`;
+  } else {
+    ge("hbtn").innerHTML=`<button class="btn-ghost" onclick="cancelForm()">← 戻る</button>`;
+  }
+  window.scrollTo(0,0);
+}
+
+function cancelForm(){
+  editIdx=-1;
+  sel={};fishSel=[];fishCounts=[];fishCount=1;
+  showRec();
 }
 
 function updateSubtitle(){
