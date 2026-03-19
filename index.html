@@ -228,13 +228,18 @@ function updateSubtitle(){
 
 // ===== Google Sheets 読み込み =====
 async function loadFromSheet(){
-  ge("page-rec").innerHTML=`<div class="loading"><span class="loading-spin">⚓</span>データを読み込み中…</div>`;
+  ge("page-rec").innerHTML=`<div class="loading"><span class="loading-spin">⚓</span>データを読み込み中…<br><span style="font-size:0.8em;color:#4a7a98;margin-top:8px;display:block">10秒でタイムアウトします</span></div>`;
   ge("hbtn").innerHTML="";
   showPage("rec");
+
+  // 10秒タイムアウト
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),10000);
+
   try{
-    const res=await fetch(gasUrl+"?t="+Date.now());
+    const res=await fetch(gasUrl+"?t="+Date.now(),{signal:controller.signal});
+    clearTimeout(timer);
     const data=await res.json();
-    // スプレッドシートの行をrecオブジェクトに変換
     recs=data.map(row=>({
       id:String(row["id"]||row["ID"]||"fish-"+Date.now()+Math.random()),
       createdAt:row["作成日時"]||"",
@@ -265,11 +270,22 @@ async function loadFromSheet(){
       omori:row["オモリ号"]||"",
       memo:row["メモ"]||"",
       fish:parseFish(row["釣果"]||""),
-    })).reverse(); // 新しい順
+    })).reverse();
     updateSubtitle();
     showRec();
   }catch(e){
-    ge("page-rec").innerHTML=`<div class="empty"><div style="font-size:36px;margin-bottom:12px">⚠️</div><div style="color:#e09090;margin-bottom:8px">データの読み込みに失敗しました</div><div style="font-size:12px">GASのURLを確認してください</div><button class="btn-ghost" style="margin-top:16px" onclick="loadFromSheet()">再試行</button></div>`;
+    clearTimeout(timer);
+    const isTimeout=e.name==="AbortError";
+    ge("page-rec").innerHTML=`
+      <div class="empty">
+        <div style="font-size:36px;margin-bottom:12px">${isTimeout?"⏱️":"⚠️"}</div>
+        <div style="color:#e09090;margin-bottom:8px">${isTimeout?"接続がタイムアウトしました":"データの読み込みに失敗しました"}</div>
+        <div style="font-size:0.85em;color:#5a8aaa;margin-bottom:16px">⚙️ 設定タブでGASのURLを確認してください</div>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+          <button class="btn-ghost" onclick="loadFromSheet()">🔄 再試行</button>
+          <button class="btn-ghost" onclick="switchTab('set')">⚙️ 設定を確認</button>
+        </div>
+      </div>`;
     ge("hbtn").innerHTML=`<button class="btn-gold" onclick="showAdd()">＋ 記録</button>`;
   }
 }
