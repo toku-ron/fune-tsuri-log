@@ -183,11 +183,8 @@ let fontSize=14;
 // ===== 初期化 =====
 function init(){
   try{const g=localStorage.getItem(SK_G);if(g)gasUrl=g;}catch{}
-  try{const f=localStorage.getItem(SK_F);if(f)fds=JSON.parse(f);}catch{}
-  try{const cf=localStorage.getItem(SK_FISH);if(cf)customFishDB=JSON.parse(cf);}catch{}
   try{const fs=localStorage.getItem("fune-fontsize");if(fs)fontSize=parseInt(fs);}catch{}
   applyFontSize();
-  // 起動時は自動読み込みしない。手動で「最新データを読み込む」を押す
   showRec();
 }
 
@@ -197,10 +194,40 @@ function applyFontSize(){
 
 function ge(id){return document.getElementById(id);}
 function esc(s){return s?String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"):""}
-function saveFds(){try{localStorage.setItem(SK_F,JSON.stringify(fds));}catch{}}
-function saveFishDB(){try{localStorage.setItem(SK_FISH,JSON.stringify(customFishDB));}catch{}}
+
+// 船宿・魚種はスプレッドシートから読み込む（localStorageは使わない）
+async function loadFunadoya(){
+  if(!gasUrl)return;
+  try{
+    const res=await fetch(gasUrl+"?type=funadoya&t="+Date.now());
+    const data=await res.json();
+    fds=data.map(row=>({
+      id:String(row["id"]||""),
+      name:String(row["name"]||""),
+      port:String(row["port"]||""),
+      tel:String(row["tel"]||""),
+      memo:String(row["memo"]||""),
+      fav:row["fav"]==="TRUE"||row["fav"]===true||row["fav"]==="1"
+    }));
+  }catch(e){console.log("船宿読み込みエラー",e);}
+}
+
+async function loadFishDB(){
+  if(!gasUrl)return;
+  try{
+    const res=await fetch(gasUrl+"?type=fish&t="+Date.now());
+    const data=await res.json();
+    customFishDB=data.filter(n=>n&&!DEFAULT_FISH.includes(n));
+  }catch(e){console.log("魚種読み込みエラー",e);}
+}
+
 function getFishList(){return [...DEFAULT_FISH,...customFishDB.filter(f=>!DEFAULT_FISH.includes(f))];}
-function addToFishDB(name){if(name&&!DEFAULT_FISH.includes(name)&&!customFishDB.includes(name)){customFishDB.push(name);saveFishDB();}}
+
+async function addToFishDB(name){
+  if(!name||DEFAULT_FISH.includes(name)||customFishDB.includes(name))return;
+  customFishDB.push(name);
+  await gasPost({_action:"saveFish",name:name});
+}
 
 function toast(msg){
   const t=ge("toast");t.textContent=msg;t.classList.add("show");
@@ -271,6 +298,8 @@ async function loadFromSheet(){
       memo:row["メモ"]||"",
       fish:parseFish(row["釣果"]||""),
     })).reverse();
+    // 船宿・魚種も同時読み込み
+    await Promise.all([loadFunadoya(), loadFishDB()]);
     updateSubtitle();
     showRec();
   }catch(e){
@@ -701,8 +730,9 @@ function quickSaveFD(){
   const name=(ge("inp-fdName").value||"").trim();
   if(!name){alert("船宿名を入力してください");return;}
   if(fds.find(f=>f.name===name)){toast("この船宿名はすでに登録されています");return;}
-  fds=[{id:Date.now(),name,port:ge("inp-port").value||"",tel:ge("inp-tel").value||"",memo:"",fav:false},...fds];
-  saveFds();
+  const fdData={id:"fd-"+Date.now(),name,port:ge("inp-port").value||"",tel:ge("inp-tel").value||"",memo:"",fav:false};
+  fds=[fdData,...fds];
+  gasPost({_action:"saveFd",...fdData});
   toast("「"+name+"」を船宿リストに保存しました！");
 }
 
@@ -741,10 +771,10 @@ function renderFishList(){
     initFishChips("chips-fish-"+i,allFish,i);
     div.querySelector("[data-minus='"+i+"']").addEventListener("click",()=>{if(fishCounts[i]>1){fishCounts[i]--;ge("fish-cnt-"+i).textContent=fishCounts[i];}});
     div.querySelector("[data-plus='"+i+"']").addEventListener("click",()=>{fishCounts[i]++;ge("fish-cnt-"+i).textContent=fishCounts[i];});
-    div.querySelector("[data-addfish='"+i+"']").addEventListener("click",()=>{
+    div.querySelector("[data-addfish='"+i+"']").addEventListener("click",async ()=>{
       const inp=ge("fish-newinp-"+i);
       const name=(inp.value||"").trim();if(!name)return;
-      addToFishDB(name);fishSel[i]=name;inp.value="";
+      await addToFishDB(name);fishSel[i]=name;inp.value="";
       initFishChips("chips-fish-"+i,getFishList(),i);
     });
     const rb=div.querySelector("[data-remove='"+i+"']");
@@ -900,8 +930,21 @@ function showFd(){
   showPage("fd");
 }
 
-function togFav(id){const i=fds.findIndex(f=>String(f.id)===String(id));if(i>=0){fds[i].fav=!fds[i].fav;saveFds();showFd();}}
-function deleteFD(id){if(!confirm("削除しますか？"))return;fds=fds.filter(f=>String(f.id)!==String(id));saveFds();showFd();}
+async function togFav(id){
+  const i=fds.findIndex(f=>String(f.id)===String(id));
+  if(i>=0){
+    fds[i].fav=!fds[i].fav;
+    await gasPost({_action:"saveFd",...fds[i]});
+    showFd();
+  }
+}
+
+async function deleteFD(id){
+  if(!confirm("削除しますか？"))return;
+  await gasPost({_action:"deleteFd",id:String(id)});
+  fds=fds.filter(f=>String(f.id)!==String(id));
+  showFd();
+}
 
 function showFdForm(id){
   const existing=id?fds.find(f=>String(f.id)===String(id)):null;
@@ -922,13 +965,23 @@ function showFdForm(id){
     </div>
     <button class="btn-gold btn-full" id="fd-save-btn">保存する</button>`;
   ge("fav-toggle").addEventListener("click",()=>{favState=!favState;ge("fav-icon").style.opacity=favState?1:0.3;ge("fav-txt").style.color=favState?"#e8d48a":"#5a8aaa";});
-  ge("fd-save-btn").addEventListener("click",()=>{
+  ge("fd-save-btn").addEventListener("click",async ()=>{
     const name=(ge("fd-name").value||"").trim();
     if(!name){alert("船宿名を入力してください");return;}
-    const data={name,port:ge("fd-port").value||"",tel:ge("fd-tel").value||"",memo:ge("fd-memo").value||"",fav:favState};
-    if(existing){fds=fds.map(f=>String(f.id)===String(existing.id)?{...f,...data}:f);}
-    else{fds=[{id:Date.now(),...data},...fds];}
-    saveFds();showFd();
+    const btn=ge("fd-save-btn");
+    btn.textContent="保存中…";btn.disabled=true;
+    const fdData={
+      id:existing?String(existing.id):"fd-"+Date.now(),
+      name,port:ge("fd-port").value||"",
+      tel:ge("fd-tel").value||"",
+      memo:ge("fd-memo").value||"",
+      fav:favState?true:false
+    };
+    await gasPost({_action:"saveFd",...fdData});
+    if(existing){fds=fds.map(f=>String(f.id)===String(existing.id)?fdData:f);}
+    else{fds=[fdData,...fds];}
+    toast("保存しました");
+    showFd();
   });
   showPage("fdform");
 }
