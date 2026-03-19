@@ -187,14 +187,8 @@ function init(){
   try{const cf=localStorage.getItem(SK_FISH);if(cf)customFishDB=JSON.parse(cf);}catch{}
   try{const fs=localStorage.getItem("fune-fontsize");if(fs)fontSize=parseInt(fs);}catch{}
   applyFontSize();
-  // URLが正しい形式かチェック
-  const validUrl=gasUrl&&gasUrl.startsWith("https://script.google.com/macros/s/");
-  if(validUrl){
-    loadFromSheet();
-  } else {
-    gasUrl=""; // 無効なURLはクリア
-    showRec();
-  }
+  // 起動時は自動読み込みしない。手動で「最新データを読み込む」を押す
+  showRec();
 }
 
 function applyFontSize(){
