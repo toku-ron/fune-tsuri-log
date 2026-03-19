@@ -61,13 +61,14 @@ select option{background:#0b1f35;color:#d4e8f4;}
     <div>
       <div class="title">⚓ 船釣りログ</div>
       <div class="subtitle" id="subtitle">読み込み中…</div>
-      <div class="version">v3.7.0 · Google Sheets連携</div>
+      <div class="version">v4.0.0 · Google Sheets連携</div>
     </div>
     <div id="hbtn"></div>
   </div>
   <div class="tabs">
     <button class="tab active" id="tab-rec" onclick="switchTab('rec')">📋 釣行</button>
     <button class="tab" id="tab-fd" onclick="switchTab('fd')">🏠 船宿</button>
+    <button class="tab" id="tab-fish" onclick="switchTab('fish')">🐟 魚種</button>
     <button class="tab" id="tab-set" onclick="switchTab('set')">⚙️ 設定</button>
   </div>
 </div>
@@ -77,6 +78,7 @@ select option{background:#0b1f35;color:#d4e8f4;}
 <div class="wrap hidden" id="page-add"></div>
 <div class="wrap hidden" id="page-fd"></div>
 <div class="wrap hidden" id="page-fdform"></div>
+<div class="wrap hidden" id="page-fish"></div>
 <div class="wrap hidden" id="page-set"></div>
 <div class="toast" id="toast"></div>
 
@@ -89,7 +91,7 @@ const WIND_DIR=["北","北東","東","南東","南","南西","西","北西","無
 const TIDE=["大潮","中潮","小潮","長潮","若潮"];
 const SHIKAKE=["天秤仕掛け","胴付き仕掛け","コマセ仕掛け","泳がせ仕掛け","落とし込み","ルアー","テンヤ","タイラバ","その他"];
 const HOOKS=["丸セイゴ","チヌ針","伊勢尼","袖針","ムツ針","メバル針","カワハギ針","タイ針","ヒラマサ針","その他"];
-const DEFAULT_FISH=["マダイ","アジ","サバ","イサキ","ヒラメ","カレイ","メバル","カサゴ","ワラサ","ブリ","スズキ","マゴチ","タチウオ","キス","アマダイ","オニカサゴ","カワハギ","クロダイ","マハタ","イカ","タコ"];
+const DEFAULT_FISH=[];
 const GAS_CODE=`function doPost(e) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   var data = JSON.parse(e.postData.contents);
@@ -240,37 +242,36 @@ function toast(msg){
 }
 
 function showPage(p){
-  ["rec","det","add","fd","fdform","set"].forEach(id=>ge("page-"+id).classList.add("hidden"));
+  ["rec","det","add","fd","fdform","fish","set"].forEach(id=>ge("page-"+id).classList.add("hidden"));
   ge("page-"+p).classList.remove("hidden");
   window.scrollTo(0,0);
 }
 
 function switchTab(t){
   curTab=t;
-  ["rec","fd","set"].forEach(k=>ge("tab-"+k).classList.toggle("active",k===t));
-  // 入力フォームが開いている場合はフォームを消さずにタブ表示だけ切り替える
+  ["rec","fd","fish","set"].forEach(k=>ge("tab-"+k)&&ge("tab-"+k).classList.toggle("active",k===t));
   const addPage=ge("page-add");
   const isFormOpen=addPage&&!addPage.classList.contains("hidden");
   if(isFormOpen){
-    // フォームを隠して対象タブのページを表示するが、フォームのDOMは保持
-    ["rec","det","add","fd","fdform","set"].forEach(id=>ge("page-"+id).classList.add("hidden"));
+    ["rec","det","add","fd","fdform","fish","set"].forEach(id=>ge("page-"+id).classList.add("hidden"));
     if(t==="rec"){ge("page-rec").innerHTML=`<div style="text-align:center;padding:40px 20px"><div style="color:#c8a830;font-size:1.1em;margin-bottom:12px">⚠️ 入力中のデータがあります</div><div style="color:#7aacb8;font-size:0.9em;margin-bottom:20px">釣行の入力を続けますか？</div><div style="display:flex;gap:10px;justify-content:center"><button class="btn-gold" onclick="resumeForm()">✏️ 入力に戻る</button><button class="btn-danger" onclick="cancelForm()">破棄して一覧へ</button></div></div>`;ge("page-rec").classList.remove("hidden");}
     else if(t==="fd"){showFd();}
+    else if(t==="fish"){showFishTab();}
     else{showSet();}
     ge("hbtn").innerHTML=`<button class="btn-ghost" onclick="resumeForm()">← 入力に戻る</button>`;
     return;
   }
   if(t==="rec")showRec();
   else if(t==="fd")showFd();
+  else if(t==="fish")showFishTab();
   else showSet();
 }
 
 function resumeForm(){
-  // フォームページを再表示
-  ["rec","det","add","fd","fdform","set"].forEach(id=>ge("page-"+id).classList.add("hidden"));
+  ["rec","det","add","fd","fdform","fish","set"].forEach(id=>ge("page-"+id).classList.add("hidden"));
   ge("page-add").classList.remove("hidden");
   curTab="rec";
-  ["rec","fd","set"].forEach(k=>ge("tab-"+k).classList.toggle("active",k==="rec"));
+  ["rec","fd","fish","set"].forEach(k=>ge("tab-"+k)&&ge("tab-"+k).classList.toggle("active",k==="rec"));
   if(editIdx>=0){
     ge("hbtn").innerHTML=`<button class="btn-ghost" onclick="showDet(${editIdx})">← 戻る</button>`;
   } else {
@@ -1033,6 +1034,61 @@ function showFdForm(id){
     showFd();
   });
   showPage("fdform");
+}
+
+// ===== 魚種タブ =====
+async function showFishTab(){
+  ge("hbtn").innerHTML="";
+  const m=ge("page-fish");
+  m.innerHTML=`<div class="loading"><span class="loading-spin">🐟</span>魚種データを読み込み中…</div>`;
+  showPage("fish");
+  try{
+    // 魚種リストと集計を並行取得
+    const timeout=new Promise((_,reject)=>setTimeout(()=>reject(new Error("TIMEOUT")),10000));
+    const [fishRes, statsRes]=await Promise.all([
+      Promise.race([fetch(gasUrl+"?type=fish&t="+Date.now()),timeout]),
+      Promise.race([fetch(gasUrl+"?type=fishstats&t="+Date.now()),timeout])
+    ]);
+    const fishList=await fishRes.json();
+    const stats=await statsRes.json();
+    customFishDB=fishList.filter(n=>n);
+
+    if(!fishList.length){
+      m.innerHTML=`
+        <div class="empty">
+          <div style="font-size:40px;margin-bottom:10px">🐟</div>
+          <div style="color:#5a8aaa;margin-bottom:6px">まだ魚種が登録されていません</div>
+          <div style="font-size:0.85em;color:#3a6a88">釣行記録で魚種を入力すると自動的に追加されます</div>
+        </div>`;
+      return;
+    }
+
+    // 集計データと合わせて表示（釣果合計数で降順ソート）
+    const sorted=fishList.slice().sort((a,b)=>{
+      const ta=stats[a]?stats[a].total:0;
+      const tb=stats[b]?stats[b].total:0;
+      return tb-ta;
+    });
+
+    m.innerHTML=`
+      <h2 style="font-size:16px;color:#e8d48a;letter-spacing:2px;margin-bottom:16px">🐟 魚種別釣果</h2>
+      <button class="btn-ghost btn-full" style="margin-bottom:14px;font-size:0.85em" onclick="showFishTab()">🔄 最新データを読み込む</button>
+      ${sorted.map(name=>{
+        const s=stats[name]||{total:0,times:0,lastDate:""};
+        return`<div class="card" style="padding:14px 16px;margin-bottom:10px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="font-size:1.1em;font-weight:700;color:#e8d48a">${esc(name)}</div>
+            <div style="font-size:1.3em;font-weight:700;color:#c8a830">${s.total}匹</div>
+          </div>
+          <div style="display:flex;gap:16px;margin-top:8px;font-size:0.85em;color:#7aacb8">
+            <span>🎣 ${s.times}回</span>
+            ${s.lastDate?`<span>📅 最終: ${esc(String(s.lastDate).substring(0,10))}</span>`:""}
+          </div>
+        </div>`;
+      }).join("")}`;
+  }catch(e){
+    m.innerHTML=`<div class="empty"><div style="color:#e09090">読み込みに失敗しました</div><button class="btn-ghost" style="margin-top:16px" onclick="showFishTab()">再試行</button></div>`;
+  }
 }
 
 // ===== 設定タブ =====
