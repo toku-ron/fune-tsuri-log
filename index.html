@@ -468,6 +468,8 @@ function normalizeDate(v){
   if(s.match(/^\d{4}-\d{2}-\d{2}/))return s.substring(0,10);
   return s;
 }
+
+function normalizeTime(v){
   if(!v&&v!==0)return"";
   // 数値（小数）の場合 → Googleスプレッドシートの時刻内部形式 0.208333... = 5:00
   if(typeof v==="number"||(!isNaN(parseFloat(v))&&String(v).match(/^[\d.]+$/))){
