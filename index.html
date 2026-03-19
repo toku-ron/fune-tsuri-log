@@ -61,7 +61,7 @@ select option{background:#0b1f35;color:#d4e8f4;}
     <div>
       <div class="title">⚓ 船釣りログ</div>
       <div class="subtitle" id="subtitle">読み込み中…</div>
-      <div class="version">v3.6.0 · Google Sheets連携</div>
+      <div class="version">v3.7.0 · Google Sheets連携</div>
     </div>
     <div id="hbtn"></div>
   </div>
@@ -705,24 +705,35 @@ function initForm(r){
   }
 }
 
-function showAdd(){
+async function showAdd(){
   editIdx=-1;
   sel={weather:"",windDir:"",tide:"",seat:"",shikake:"",hookType:""};
   fishSel=[""];fishCounts=[1];fishCount=1;
+  // 最新の魚種・船宿を読み込む
+  await Promise.all([loadFishDB(), loadFunadoya()]);
   ge("hbtn").innerHTML=`<button class="btn-ghost" onclick="showRec()">← 戻る</button>`;
   initForm(null);
   showPage("add");
 }
 
-function showEdit(i){
+async function showEdit(i){
   editIdx=i;
   const r=recs[i];
+  // 最新の魚種リストを読み込んでからフォームを開く
+  await loadFishDB();
   sel={
     weather:r.weather||"",windDir:r.windDir||"",tide:r.tide||"",
     seat:r.seat||"",shikake:r.shikake||"",hookType:r.hookType||""
   };
-  // species を確実に文字列として取得
-  fishSel=(r.fish||[]).map(f=>typeof f==="string"?f:String(f.species||""));
+  // species を確実に文字列として取得し、カスタム魚種はDBに追加
+  fishSel=(r.fish||[]).map(f=>{
+    const name=typeof f==="string"?f:String(f.species||"");
+    // カスタム魚種DBにない場合は追加（シートには書かない）
+    if(name&&!DEFAULT_FISH.includes(name)&&!customFishDB.includes(name)){
+      customFishDB.push(name);
+    }
+    return name;
+  });
   fishCounts=(r.fish||[]).map(f=>Number(typeof f==="object"?f.count:1)||1);
   fishCount=Math.max(1,(r.fish||[]).length);
   ge("hbtn").innerHTML=`<button class="btn-ghost" onclick="showDet(${i})">← 戻る</button>`;
